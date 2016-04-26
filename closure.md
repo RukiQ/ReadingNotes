@@ -23,3 +23,12 @@
 > 作用域链的前端，始终是是当前执行的代码所在环境的变量对象。如果这个环境是函数，则将其活动对象作为变量对象。作用域链中的下一个变量对象来自包含（外部）环境，而再下一个变量对象则来自下一个包含环境。这样，一直延续到全局执行环境；全局执行环境的变量对象始终都是作用域链中的最后一个对象。
 
 当函数执行完毕后，局部活动对象就会被销毁，内存中仅保存`全局作用域`（全局执行环境的变量对象）。但是，`闭包`的情况又有所不同。在另一个函数内部定义的函数会将包含函数（即外部函数）的活动对象添加到它的作用域链中。
+
+
+http://www.cnblogs.com/pigtail/archive/2012/07/19/2570988.html
+
+http://www.cnblogs.com/zxj159/archive/2013/05/17/3084598.html
+
+https://developer.mozilla.org/cn/docs/Web/JavaScript/Closures
+
+http://www.jb51.net/onlineread/JavaScript-Garden-CN/#function.closures
