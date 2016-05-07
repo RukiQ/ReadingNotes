@@ -26,6 +26,116 @@
 
 > 函数在闭包里执行的时候，不仅可以在闭包创建的时刻点上看到这些变量的值，我们还可以对其进行更新。换句话说，闭包不仅是在创建那一时刻点的状态的快照，而且是一个真实的状态封装，只要闭包存在，就可以对其进行修改。
 
-### 利用闭包提高性能
+### 利用闭包提高性能及解决常见的作用域问题
 
-### 利用闭包解决常见的作用域问题
+1.**绑定函数上下文**
+
+ `bind`：
+
+> Prototype 的 `bind()`（或者是我们自己实现的），并不意味着它是 `apply()` 或 `call()` 的一个替代方法，该方法的*潜在目的* 是通过匿名函数和闭包控制后续执行的上下文。这个重要的区别使 `apply()` 或 `call()` 对事件处理程序和定时器的回调进行延迟执行特别有帮助。
+
+2.**偏应用函数**
+
+`柯里化`：在一个函数中首先填充几个参数（然后再返回一个新函数）的技术。
+
+3.**函数重载**
+
+（1）缓存记忆
+
+（2）函数包装
+
+4.**即时函数**
+
+`即时函数（立即执行函数）`：依赖于对闭包的充分利用。
+
+	(function() {
+		statement..;
+	})();
+
+> - 创建一个函数实例。
+
+> - 执行该函数。
+
+> - 销毁该函数（因为语句结束以后，，没有任何引用了）。
+
+*即时函数的用处：*
+
+###### - 临时作用域和私有变量
+
+（1）创建一个独立作用域：
+
+> 利用即时函数，我们可以利用其内部作用域来创建一个临时的作用域，用于存储数据状态。
+
+> 记住，JavaScript 中的作用域依赖于定义变量的函数。在很多编程语言中，作用域是依赖于代码块的，但在 JavaScript 中，变量的作用域依赖于变量所在的闭包。
+
+	// method 1	
+	(function() {
+		var numClicks = 0;
+		document.addEventListener("click", function(){
+			alert( ++numClicks );
+		},false);
+	})();
+	
+	// method 2
+	document.addEventListener("click", (function() {
+		var numClicks = 0;
+		return function() {
+			alert( ++numClicks );
+		}
+	})(), false);
+
+（2）通过参数限制作用域内的名称
+
+	(function(what) {
+		alert(what);
+	})('Hi there!');
+
+（3）使用简洁名称让代码保持可读性
+
+	(function(v) {
+		Object.extend(v, {
+			href: v._getAttr,
+			src:  v._getAttr,
+			...
+		});
+	})(Element.attributeTranslations.read.values);
+
+> 这种在作用域内创建临时变量的技巧，对没有延迟调用的循环遍历来说尤其有用。
+
+###### - 循环
+
+> 闭包记住的是变量的引用，而不是闭包创建时刻该变量的值。
+
+	var div = document.getElementsByTagName("div");
+	
+	for (var i=0; i < div.length; i++) {
+		(function(n) {
+			div[n].addEventListener("click", function() {
+				alert("div #" + n + " was clicked.");
+			}, false);
+		})(i);
+	}
+
+###### - 类库包装
+
+> 闭包和即时函数可以帮助我们让类库尽可能的保持私有，并且可以选择性的让一些变量暴露到全局命名空间内。
+
+	// method 1
+	(function() {
+		var jQuery = window.jQuery = function() {
+			// Initialize
+		};
+
+		// ...
+	})();
+
+	// method 2
+	var jQuery = (function() {
+		function jQuery() {
+			// Initialize
+		}
+
+		// ...
+
+		return jQuery;
+	})();
