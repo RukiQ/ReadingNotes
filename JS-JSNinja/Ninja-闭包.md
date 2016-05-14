@@ -56,6 +56,8 @@
 
 - 针对在函数声明那一时刻点的作用域内的所有函数和变量，闭包创建了一个<span style="color:red;">“安全气泡”</span>，因此函数获得了执行操作所需的所有东西。
 
+![closure](https://github.com/RukiQ/blog-learning-patch/blob/master/JS-JSNinja/img/closure.png?raw=true)
+
 <span style="background:yellow">闭包的三个有趣的概念：</span>
 
 1. 内部函数的参数是包含在闭包中的。
