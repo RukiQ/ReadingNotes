@@ -1,10 +1,10 @@
 ## 函数是根基
 
-### <p style="background:#orange;">理解函数为什么如此重要</p>
+### <p style="background: orange;">理解函数为什么如此重要</p>
 
 JavaScript 是一门 `函数式语言` 。
 
-### <p style="background:#orange;">函数为什么是第一型对象</p>
+### <p style="background: orange;">函数为什么是第一型对象</p>
 
 在 JavaScript 中，函数可以共处，可以将其视为其他任意类型的 JavaScript 对象而进行使用，除此之外，函数还有一个特殊的功能，它们可以 `被调用`（通常以 `异步方式` 进行调用）。
 
@@ -20,7 +20,7 @@ JavaScript 是一门 `函数式语言` 。
 
 > - 它们拥有动态创建并赋值的属性。
 
-### <p style="background:#orange;">浏览器如何调用函数</p>
+### <p style="background: orange;">浏览器如何调用函数</p>
 
 1. 我们为浏览器中发生的各种事件建立事件处理程序，这些事件在触发时被放置在一个事件队列中（先进先出列表[FIFO]）；
 
@@ -36,7 +36,7 @@ JavaScript 是一门 `函数式语言` 。
 
 `回调`：我们定义一个函数，以便其他一些代码在适当的时机回头再调用它。
 
-### <p style="background:#orange;">函数声明</p>
+### <p style="background: orange;">函数声明</p>
 
 JavaScript 函数是使用 `函数字面量` 进行声明从而创建函数值的。
 
@@ -64,7 +64,7 @@ JavaScript 函数是使用 `函数字面量` 进行声明从而创建函数值�
 
 函数可以在其作用域范围内提前被引用，而变量不行。
 
-### <p style="background:#orange;">参数赋值之谜</p>
+### <p style="background: orange;">参数赋值之谜</p>
 
 > **函数调用**的四种方式：
 
@@ -128,7 +128,7 @@ JavaScript 函数是使用 `函数字面量` 进行声明从而创建函数值�
 
 - 实际使用时，选择最能匹配参数的那个方法。
 
-### <p style="background:#orange;">函数上下文</p>
+### <p style="background: orange;">函数上下文</p>
 
 - 函数是程序的构建块而不是命令式语句。
 

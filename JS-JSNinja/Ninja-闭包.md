@@ -1,6 +1,6 @@
 ## 闭包
 
-### <p style="background:#orange;">闭包是什么，它们是如何工作的</p>
+### <p style="background:orange;">闭包是什么，它们是如何工作的</p>
 
 > <span style="color:red;">**闭包**</span> 是一个函数在创建时允许该自身函数访问并操作该自身函数之外的变量时所创建的**作用域**。
 
@@ -64,7 +64,33 @@
 2. 作用域之外的所有变量，即便是函数声明之后的那些声明，也都包含在闭包中。
 3. 相同的作用域内，尚未声明的变量不能进行提前引用。
 
-### <p style="background:#orange;">利用闭包简化开发</p>
+*例子：*
+
+	var outerValue = "ninja";
+	var later;
+	
+	function outerFunction() {
+		var innerValue = "samurai";
+	
+		function innerFunction(paramValue) {
+			console.log(outerValue);
+			console.log(innerValue);
+			console.log(paramValue);
+			console.log(tooLate);
+		}
+	
+		later = innerFunction;
+	}
+	
+	console.log(tooLate);	// undefined
+	
+	var tooLate = "ronin";
+	
+	outerFunction();	
+	
+	later('wakizashi');		// ninja,samurai,wakizashi,ronin
+
+### <p style="background:orange;">利用闭包简化开发</p>
 
 **闭包的常见用法：**
 
@@ -88,11 +114,47 @@
 
 - <span style="color:red;">*回调与计时器* </span>： 在这种情况下，函数都是在后期未指定的时间进行异步调用，在这种函数内部，我们经常需要访问外部数据，闭包可以作为一种访问这些数据的很直观的方式，特别是当我们希望避免创建全局变量来存储这些信息时。
 
+		// 示例1：在 Ajax 请求的 callback 里使用闭包
+		jQuery('#testButton').click(function() {
+			var elem$ = jQuery('#testSubject');
+		
+			elem$.html("Loading...");
+		
+			jQuery.ajax({
+				url: "test.html",
+				success: function(html) {	// 通过闭包引用了elem$变量
+					console.log(elem$);
+					elem$.html(html);
+				}
+			});
+		});
+
+		// 示例2：在计时器间隔回调中使用闭包
+		function animateIt(elementId) {
+		
+			var elem = document.getElementById(elementId);
+			var tick = 0;
+		
+			var timer = setInterval(function() {
+				if (tick < 100) {
+					elem.style.left = elem.style.top = tick + "px";
+					tick++;
+				} else {
+					clearInterval(timer);
+					console.log(tick == 100);
+					console.log(elem);
+					console.log(timer);
+				}
+			}, 10);
+		}
+		
+		animateIt('box');
+
 > 没有闭包，同时做多件事情的时候，无论是事件处理，还是动画，甚至是 Ajax 请求，都将是及其困难的。
 
 > 函数在闭包里执行的时候，不仅可以在闭包创建的时刻点上看到这些变量的值，我们还可以对其进行更新。换句话说，闭包不仅是在创建那一时刻点的状态的快照，而且是一个真实的状态封装，只要闭包存在，就可以对其进行修改。
 
-### <p style="background:#orange;">利用闭包提高性能&&解决常见的作用域问题</p>
+### <p style="background:orange;">利用闭包提高性能&&解决常见的作用域问题</p>
 
 1.**绑定函数上下文**
 
@@ -149,6 +211,8 @@
 			alert( ++numClicks );
 		}
 	})(), false);
+
+- 这是一种最常见的即时函数使用方式：简单，自包装功能。各功能所需的变量都保存在闭包内，但对其他地方却都不可见。
 
 （2）通过参数限制作用域内的名称
 
