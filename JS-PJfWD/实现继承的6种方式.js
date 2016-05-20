@@ -238,3 +238,89 @@ alert(instance1 instanceof SubType);	// true
 alert(Object.prototype.isPrototypeOf(instance1));	// true
 alert(SuperType.prototype.isPrototypeOf(instance1));	// true
 alert(SubType.prototype.isPrototypeOf(instance1));	// true
+
+
+
+
+
+/*-----------------------------------------------------------------------*/
+
+// 原型式继承
+function object(o) {
+	// 先创建一个临时性的构造函数
+	function F() {};
+
+	// 将传入的对象作为这个构造函数的原型
+	F.prototype = o;
+
+	// 返回这个临时类型的新实例
+	return new F();
+}
+
+// 本质上来讲，object() 对其中的对象执行了一次浅复制
+var person = {
+	name : "Nicholas",	// 基本类型值属性
+	friends : ["Shelby", "Court"]	// 引用类型值属性
+};
+
+var person1 = object(person);
+person1.name = "Greg";
+person1.friends.push("Rob");
+
+var person2 = object(person);
+person2.name = "Linda";
+person2.friends.push("Barbie");
+
+console.log(person.friends);	// ["Shelby", "Court", "Rob", "Barbie"]
+
+
+/*
+ * Object.create() 方法：规范化了原型式继承
+ */
+var person3 = Object.create(person);
+person3.name = "Allie";
+person3.friends.push("Anna");
+
+var person4 = Object.create(person);
+person4.name = "John";
+person4.friends.push("Mark");	
+
+console.log(person.friends);	// ["Shelby", "Court", "Rob", "Barbie", "Anna", "Mark"]
+
+// Object.create() 传入第二个参数，会覆盖原型对象上的同名属性
+var person5 = Object.create(person, {
+	name: {
+		value: "Don"
+	}
+})
+
+console.log(person5.name);	// Don
+
+
+
+
+
+
+/*-----------------------------------------------------------------------*/
+
+// 寄生式继承
+/*
+ * 利用原型式继承所创建的 object() 函数，但不是必须的
+ * 任何能够返回新对象的函数都是用于此模式
+ */
+function createAnother(original) {
+	var clone = object(original);	// 通过调用函数创建一个新对象
+	clone.sayHi = function() {	// 以某种方式来增强这个对象
+		alert("hi");
+	};
+	return clone;	// 返回这个对象
+}
+
+// 使用
+var person = {
+	name : "Nicholas",
+	friends : ["Shelby", "Court"]
+};
+
+var anotherPerson = createAnother(person);
+anotherPerson.sayHi();	// hi

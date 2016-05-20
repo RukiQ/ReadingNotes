@@ -87,7 +87,7 @@
 
 > 这些重复操作符可以是 <span style="color:red">*贪婪的* </span>或 <span style="color:red">*非贪婪的*</span>。默认情况下，它们是 *贪婪的*：它们匹配所有的字符组合。
 
-> 在操作符后面加一个问号 <span style="color:red">`?`</span> 字符（`?` 操作符的一个重载），如 `a+?`，可以让该表达式编程称为 *非贪婪的*：进行最小限度的匹配。
+> 在操作符后面加一个问号 <span style="color:red">`?`</span> 字符（`?` 操作符的一个重载），如 <span style="color:red">`a+?`</span>，可以让该表达式编程称为 <span style="background:yellow">*非贪婪的*：进行最小限度的匹配。</span>
 
 	// 对字符串 "aaa" 进行匹配
 	/a+/：将匹配所有这三个字符
