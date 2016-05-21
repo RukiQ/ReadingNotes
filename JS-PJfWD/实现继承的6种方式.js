@@ -83,7 +83,7 @@ SubType.prototype.getSuperValue = function() {
 	return false;
 }
 
-var instance = new SubType;
+var instance = new SubType();
 alert(instance.getSuperValue());	// false
 
 
@@ -324,3 +324,41 @@ var person = {
 
 var anotherPerson = createAnother(person);
 anotherPerson.sayHi();	// hi
+
+
+
+
+
+/*-----------------------------------------------------------------------*/
+
+// 寄生组合式继承
+function inheritPrototype(subType, superType) {
+	var prototype = object(superType.prototype);	// 创建对象，即创建超类型原型的副本
+	prototype.constructor = subType;	// 增强对象，即为创建的副本添加 contructor 属性
+	subType.prototype = prototype;	// 指定对象，即将新创建的对象（副本）赋值给子类型的原型
+}
+
+function SuperType(name) {
+	this.name = name;
+	this.colors = ["red", "blue", "green"];
+}
+
+SuperType.prototype.sayName = function() {
+	alert(this.name);
+}
+
+function SubType(name, age) {
+	SuperType.call(this, name);
+
+	this.age = age;
+}
+
+inheritPrototype(SubType, SuperType);
+
+SubType.prototype.sayAge = function() {
+	alert(this.age);
+}
+
+var instance = new SubType("Nicholas", 29);
+instance.sayName();	// "Nicholas"
+instance.sayAge();	// 29
