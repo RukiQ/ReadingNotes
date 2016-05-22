@@ -1,4 +1,4 @@
-## 正则表达式
+## 正则表达式  (By Ruth92)
 
 `正则表达式` 是一个拆分字符串并查询相关信息的过程。
 
@@ -6,7 +6,7 @@
 
 > 正则表达式测试网站：[Regular Expression Test Page for JavaScript](http://www.regexplanet.com/advanced/javascript/index.html)
 
-### <p style="background:#orange;">正则表达式进修</p>
+### <p style="background:orange;">正则表达式进修</p>
 
 > `正则表达式` 通常被称为 `模式`，是一个用简单方式描述或匹配一系列符合某个句法规则的字符串。
 
@@ -116,7 +116,7 @@
 
 > 不同于 /[dtn]a[dtn]/，a 后面的字符有可能不是 "d" "t" 或 "n" 开头，但这个字符肯定是以触发该匹配的其中一个字符 ("d" "t" 或 "n") 开头。因此，\1 匹配的字符需要在执行的时候才能确定。
 
-### <p style="background:#orange;">编译正则表达式</p>
+### <p style="background:orange;">编译正则表达式</p>
 
 正则表达式的两个重要阶段：
 
@@ -124,11 +124,33 @@
 
 （2）<span style="color:red">*执行*</span>：发生在我们使用编译过的正则表达式进行字符串匹配的时候。
 
+	/*
+	 * 创建编译后正则表达式的两种方式
+	 * 正则表达式在创建之后都处于编译后的状态
+	 */
+	var re1 = /test/i;	// 通过字面量创建
+	
+	var re2 = new RegExp("test", "i");	// 通过构造器创建
+	
+	console.log(re1.toString() == "/test/i");	// true
+	console.log(re1.test("TesT"));	// true
+	console.log(re2.test("TesT"));	// true
+	console.log(re1.toString() == re2.toString());	// true
+	console.log(re1 != re2);	// true
+
+- 如果将 `re1` 的引用再替换成 `/test/i` 字面量，那么同一个正则表达式可能又被编译多次，所以<span style="color:#b01c57">正则表达式只编译一次，并将其保存在一个变量中以供后续使用，这是一个重要的**优化过程**</span>。
+
 <span style="background:yellow;">注意</span>：每个正则表达式都有一个独立的对象表示，每次创建正则表达式（也因此被编译），都会为此创建一个新的正则表达式对象。和其他的原始类型不太一样，<span style="color:#b01c57">其结果将永远是独一无二的</span>。
 
 <span style="background:yellow;">特别重要的一点</span>，用 `构造器` 创建正则表达式的使用，这种技术允许我们，<span style="color:#b01c57">在运行时通过动态创建的字符串构建和编译一个正则表达式</span>。对于构建大量重用的复杂表达式来说，这是非常有用的。
 
-### <p style="background:#orange;">用正则表达式进行捕捉操作</p>
+
+
+
+
+- 在该例子的正则中，要注意 `反斜杠（\\）`的使用：`\\s`。创建带有反斜杠字面量正则表达式时，只需要提供一个反斜杠即可。但是，由于<span style="color:#b01c57">我们在字符串中写反斜杠，所以需要 `双反斜杠` 进行转义</span>。要明白，我们是用字符串（而不是字面量）来构建正则表达式。
+
+### <p style="background:orange;">用正则表达式进行捕捉操作</p>
 
 正则表达式的 **实用性** 表现在捕获已匹配的结果上，这样我们便可以在其中进行处理。
 
@@ -171,7 +193,7 @@
 	// 内层小括号 ——> 针对 + 操作符，对 "ninja-" 文本进行分组
 	// ?: ——> 只会为外层的括号创建捕获，内层括号被转换为一个被动子表达式
 
-### <p style="background:#orange;">利用函数进行替换</p>
+### <p style="background:orange;">利用函数进行替换</p>
 
 <span style="color:red">`String` 对象的 `replace` 方法</span>:
 
@@ -248,17 +270,69 @@
 
 > 利用这种技巧，我们可以使用 `String` 对象的 `replace()` 方法作为<span style="background:yellow">字符串搜索机制</span>。搜索结果不仅快速，而且简单、有效。
 
-### <p style="background:#orange;">常用正则表达式</p>
+### <p style="background:orange;">常用正则表达式</p>
 
-###### <span style="color:#ac4a4a">修建字符串：</span>
+###### <span style="color:#ac4a4a">1. 修剪字符串：</span>
+
+	// 修剪字符串
+	function trim(str) {
+		return (str || "").replace(/^\s+|\s+$/g, "");
+	}
+	
+	trim(" #id div.class ");	// "#id div.class"
+
+
+###### <span style="color:#ac4a4a">2. 匹配换行符：</span>
+	
+	// 匹配所有的字符，包括换行符
+	var html = "<b>Hello</b>\n<i>world!</i>";
+	
+	// 显示换行符没有被匹配到
+	console.log(/.*/.exec(html)[0] === "<b>Hello</b>");	// true
+	
+	// 使用空白符匹配方式匹配所有的元素，为最佳方案
+	console.log(/[\S\s]*/.exec(html)[0] === "<b>Hello</b>\n<i>world!</i>");	// true
+	
+	// 用另一种方式匹配所有元素
+	console.log(/(?:.|\s)*/.exec(html)[0] === "<b>Hello</b>\n<i>world!</i>");	// true
+
+###### <span style="color:#ac4a4a">3. Unicode：</span>
+
+	// 匹配 Unicode 字符
+	var text = "\u5FCD\u8005\u30D1\u30EF\u30FC";
+	
+	var matchAll = /[w\u0080-\uFFFF_-]+/;
+	
+	text.match(matchAll);	// ["忍者パワー"]
+
+###### <span style="color:#ac4a4a">4. 转义字符：</span>
+
+	// 在 CSS 选择器中匹配转义字符
+	var pattern = /^((\w+)|(\\.))+$/;	// 允许匹配一个单词字符，
+										// 或一个反斜杠及后面跟随任意字符(甚至是另外一个反斜杠)
+										// 或者两者都可以匹配
+	var tests = [
+		"formUpdate",	// true
+		"form\\.update\\.whatever",	// true
+		"form\\:update",	// true
+		"\\f\\o\\r\\m\\u\\p\\d\\a\\t\\e",	// true
+		"form:update"	// false，未能匹配到非单词字符(:)
+	];
+	
+	for (var n=0; n<tests.length; n++) {
+		console.log(pattern.test(tests[n]));
+	}
 
 
 
+### <p style="background: #cfc9fa">参考博文：</span>
 
-###### <span style="color:#ac4a4a">匹配换行符：</span>
+[JavaScript 正则表达式上——基本语法](http://www.cnblogs.com/dolphinX/p/3486214.html)
 
+[JavaScript正则表达式下——相关方法](http://www.cnblogs.com/dolphinX/p/3486136.html)
 
+[我所认识的JavaScript正则表达式](http://www.codeceo.com/article/javascript-reg-expression.html)
 
+[正则表达式 - 教程](http://www.runoob.com/regexp/regexp-tutorial.html)
 
-
-###### <span style="color:#ac4a4a">Unicode：</span>
+[解惑正则表达式中的捕获](http://www.cnblogs.com/yakun/p/3795589.html)
