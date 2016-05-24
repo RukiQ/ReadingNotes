@@ -1,4 +1,4 @@
-## 正则表达式  (By Ruth92)
+## 正则表达式  （整理 by qianlu）
 
 `正则表达式` 是一个拆分字符串并查询相关信息的过程。
 
@@ -144,9 +144,46 @@
 
 <span style="background:yellow;">特别重要的一点</span>，用 `构造器` 创建正则表达式的使用，这种技术允许我们，<span style="color:#b01c57">在运行时通过动态创建的字符串构建和编译一个正则表达式</span>。对于构建大量重用的复杂表达式来说，这是非常有用的。
 
+<span style="color:#ac4a4a">[例子：]</span>
 
+	<div calss="samurai ninja">a</div>
+	<div class="ninja samurai">b</div>
+	<div></div>
+	<span class="samurai ninja ronin">c</span>
 
+	<script>
+		function findClassInElements(className, type) {
 
+			var elems = document.getElementsByTagName(type || "*");
+
+			/* 
+			 * 正则表达式匹配的字符串：
+			 * 要以空字符串或空格开始，
+			 * 而后跟着指定样式名称，
+			 * 并且紧随其后的是一个空白字符或结束字符串
+			 */
+			var regex = new RegExp("(^|\\s)" + className + "(\\s|$)");
+
+			var results = [];
+
+			for (var i = 0, length = elems.length; i < length; i++) {
+				if (regex.test(elems[i].className)) {
+					results.push(elems[i]);
+				}
+			}
+
+			return results;
+		}
+
+		var results1 = findClassInElements("ninja", "div");	// <div class="ninja samurai">b</div>
+		var results2 = findClassInElements("ninja", "span"); // <span class="samurai ninja ronin">c</span>
+		var results3 = findClassInElements("ninja");	// <div class="ninja samurai">b</div>
+														// <span class="samurai ninja ronin">c</span>
+
+		console.log(results1.length);	// 1
+		console.log(results2.length);	// 1
+		console.log(results3.length);	// 2
+	</script>
 
 - 在该例子的正则中，要注意 `反斜杠（\\）`的使用：`\\s`。创建带有反斜杠字面量正则表达式时，只需要提供一个反斜杠即可。但是，由于<span style="color:#b01c57">我们在字符串中写反斜杠，所以需要 `双反斜杠` 进行转义</span>。要明白，我们是用字符串（而不是字面量）来构建正则表达式。
 
@@ -168,6 +205,46 @@
 
 使用 <span style="color:red">`match()` 或 `exec()`</span>，我们总是可以找到想要寻找的精确匹配。
 
+<span style="color:#ac4a4a">[例子1：]</span>
+
+	// 使用 match() 进行全局搜索和局部搜索时的不同
+	var html = "<div class='test'><b>Hello</b> <i>world!</i></div>";
+	
+	// 局部正则表达式会返回一个数组，该数组包含了在匹配操作中匹配的整个字符串以及其他捕获结果
+	var results = html.match(/<(\/?)(\w+)([^>]*?)>/);	// 局部正则匹配
+	
+	console.log(results);	// ["<div class='test'>", "", "div", " class='test'"]
+	console.log(results[0] == "<div class='test'>");	// true
+	console.log(results[1] == "");	// true
+	console.log(results[2] == "div");	// true
+	console.log(results[3] == " class='test'");	// true
+	
+	// 全局正则表达式返回一个数组，匹配所有可能的匹配结果，而不仅仅是第一个匹配结果
+	var all = html.match(/<(\/?)(\w+)([^>]*?)>/g);	// 全局正则匹配
+	
+	console.log(all);	// ["<div class='test'>", "<b>", "</b>", "<i>", "</i>", "</div>"]
+	console.log(all[0] == "<div class='test'>");	// true
+	console.log(all[1] == "<b>");	// true
+	console.log(all[2] == "</b>");	// true
+	console.log(all[3] == "<i>");	// true
+	console.log(all[4] == "</i>");	// true
+	console.log(all[5] == "</div>");	// true
+
+<span style="color:#ac4a4a">[例子2：]</span>
+
+	// 使用 exec() 方法进行捕获和全局搜索
+	var html = "<div class='test'><b>Hello</b> <i>world!</i></div>";
+	
+	var tag = /<(\/?)(\w+)([^>]*?)/g, match;
+	var num = 0;
+	
+	while ((match = tag.exec(html)) !== null) {
+		console.log(match.length);	// 4
+		num++;
+	}
+	
+	console.log(num);	// 6
+
 #####3.&nbsp;捕获的引用
 
 有 *两种方法* ，可以引用捕获到的匹配结果：
@@ -177,6 +254,32 @@
 （2）替换字符串
 
 > 与反向引用不同，通过调用 <span style="color:red">`replace()`</span> 方法替换字符串获得捕捉的引用时，使用 <span style="color:red">`$1`、`$2`、`$3`</span> 语法表示每个捕获的数字
+
+	/*
+	 * 使用反向引用匹配 HTML 标签内容
+	 */
+	var html = "<div class='hello'>Hello</b> <i>world!</i>";
+	
+	var pattern = /<(\w+)([^>]*)>(.*?)<\/\1>/g;	// 使用捕获的反向引用
+	
+	var match = pattern.exec(html);	// 在测试字符串上进行匹配
+	
+	console.log(match);	// ["<i>world!</i>", "i", "", "world!"]
+	
+	console.log(match[0] == "<div class='hello'>Hello</b>");	// false
+	console.log(match[1] == "b");	// false
+	console.log(match[2] == " class='hello'");	// false
+	console.log(match[3] == "Hello");	// false
+	
+	console.log(match[0] == "<i>world!</i>");	// true
+	console.log(match[1] == "i");	// true
+	console.log(match[2] == "");	// true
+	console.log(match[3] == "world!");	// true
+	
+	/*
+	 * replace() 方法获得捕捉的引用：使用 $1、$2、$3 语法表示每个捕获的数字
+	 */
+	"fontFamily".replace(/([A-Z])/g, "-$1").toLowerCase();	// font-family
 
 ##### 4.&nbsp;没有捕获的分组
 
@@ -219,16 +322,13 @@
 
 
 > 当替换值（第二个参数）是一个函数时，每个匹配都会调用该函数并带有一串参数列表。
-
+>
 > - 匹配的完整文本。
-
 > - 匹配的捕获，一个捕获对应一个参数。
-
 > - 匹配字符在源字符串中的索引。
-
 > - 源字符串。
 
-<span style="color:#ac4a4a">例子：</span>
+<span style="color:#ac4a4a">[例子：]</span>
 
 	/*
 	 * 让查询字符串转换成另外一个符合我们需求的格式
