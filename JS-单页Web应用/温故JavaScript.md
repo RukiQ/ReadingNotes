@@ -38,7 +38,7 @@
 
 - 因为变量声明总是被提升到函数作用域的顶部，所以在函数的顶部声明变量总是最好的做法，更好的是使用**单个 `var` 语句**，这样可以和 JavaScript 的做法保持一致。
 
-##### <p style="background: #cfc9fa">3. 作用域和变量提升结合</p>
+<span style="color:#ac4a4a">**作用域和变量提升结合**</p>
 
 [例1：]
 
@@ -76,7 +76,7 @@
 	prison( 'Bob' );
 
 
-##### <p style="background: #cfc9fa">4. 高级变量提升和执行环境对象</p>
+##### <p style="background: #cfc9fa">3. 高级变量提升和执行环境对象</p>
 
 <span style="color:#ac4a4a">**提升**</span>
 
@@ -113,6 +113,18 @@ JavaScript 引擎把变量作为一个属性保存在一个对象上，这个对
 在 JavaScript 引擎中，<span style="color:red">`执行环境对象`</span> 是一种对象，属于 JavaScript 实现层面的东西，在开发的时候无法直接访问。<span style="background:yellow">间接地访问执行环境对象</span>是很容易的，因为每次使用变量，就是在访问执行环境对象的属性。
 
 ![执行环境对象]()
+
+由于可以在执行环境中调用函数，会产生很多层的深度。在执行环境中调用函数，会创建一个新的嵌套在已存在的执行环境内的执行环境。
+
+![调用函数会创建一个执行环境]()
+
+JavaScript 引擎在执行环境对象中访问作用域内的变量，查找的顺序叫作 `作用域链`，它和 `原型链` 一起，描述了 JavaScript 访问变量和属性的顺序。
+
+##### <p style="background: #cfc9fa">4. 作用域链</p>
+
+##### <p style="background: #cfc9fa">5. JavaScript 对象和原型链</p>
+
+##### <p style="background: #cfc9fa">6. 函数——更深入的窥探</p>
 
 
 ### <p style="background:orange">&nbsp;解释变量作用域链以及为什么要使用它们</p>
