@@ -24,7 +24,7 @@
 
 在 JavaScript 中，当变量被声明时，声明会被提升到它所在函数的顶部，并被赋予 undefined 值。这就使得在函数的任意位置声明的变量存在于整个函数中，尽管在赋值之前，它的值一直为 undefined。
 
-![变量提升1]()
+![变量提升1](https://github.com/RukiQ/blog-learning-patch/blob/master/JS-%E5%8D%95%E9%A1%B5Web%E5%BA%94%E7%94%A8/img/%E5%8F%98%E9%87%8F%E6%8F%90%E5%8D%871.png?raw=true)
 	
 	function prison () {
 	    console.log(prisoner);  // "undefined"
@@ -94,7 +94,7 @@ JavaScript 引擎在进入作用域时，会对代码分两轮处理：（1）�
 
 > **参数被赋值了**，因为在向函数传递参数之前，任何决定参数值的代码都可以运行了。
 
-![第一轮初始化变量]()
+![第一轮初始化变量](https://github.com/RukiQ/blog-learning-patch/blob/master/JS-%E5%8D%95%E9%A1%B5Web%E5%BA%94%E7%94%A8/img/%E7%AC%AC%E4%B8%80%E8%BD%AE%E5%88%9D%E5%A7%8B%E5%8C%96%E5%8F%98%E9%87%8F.png?raw=true)
 
 <span style="color:#ac4a4a">**执行环境和执行环境对象**——>理解 javaScript 引擎在第一轮是如何保存变量的</span>
 
@@ -112,27 +112,246 @@ JavaScript 引擎把变量作为一个属性保存在一个对象上，这个对
 
 在 JavaScript 引擎中，<span style="color:red">`执行环境对象`</span> 是一种对象，属于 JavaScript 实现层面的东西，在开发的时候无法直接访问。<span style="background:yellow">间接地访问执行环境对象</span>是很容易的，因为每次使用变量，就是在访问执行环境对象的属性。
 
-![执行环境对象]()
+![执行环境对象](https://github.com/RukiQ/blog-learning-patch/blob/master/JS-%E5%8D%95%E9%A1%B5Web%E5%BA%94%E7%94%A8/img/%E6%89%A7%E8%A1%8C%E7%8E%AF%E5%A2%83%E5%AF%B9%E8%B1%A1.png?raw=true)
 
 由于可以在执行环境中调用函数，会产生很多层的深度。在执行环境中调用函数，会创建一个新的嵌套在已存在的执行环境内的执行环境。
 
-![调用函数会创建一个执行环境]()
+![调用函数会创建一个执行环境](https://github.com/RukiQ/blog-learning-patch/blob/master/JS-%E5%8D%95%E9%A1%B5Web%E5%BA%94%E7%94%A8/img/%E8%B0%83%E7%94%A8%E5%87%BD%E6%95%B0%E4%BC%9A%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E6%89%A7%E8%A1%8C%E7%8E%AF%E5%A2%83.png?raw=true)
 
 JavaScript 引擎在执行环境对象中访问作用域内的变量，查找的顺序叫作 `作用域链`，它和 `原型链` 一起，描述了 JavaScript 访问变量和属性的顺序。
 
-##### <p style="background: #cfc9fa">4. 作用域链</p>
-
-##### <p style="background: #cfc9fa">5. JavaScript 对象和原型链</p>
-
-##### <p style="background: #cfc9fa">6. 函数——更深入的窥探</p>
-
-
 ### <p style="background:orange">&nbsp;解释变量作用域链以及为什么要使用它们</p>
+
+作用域是很微妙的，像嵌套执行环境。更准确地讲，可以把变量作用域看作链 ——> `作用域链`。
+
+在运行期，JavaScript 会检索作用域层级来解析变量名。
+
+>
+> 它从当前作用域开始，然后按它的查找方式回到顶级的作用域，即 window（浏览器）或者 global（node.js）对象。
+> 它使用找到的第一次匹配并停止查找。
+
+在层级更深的嵌套作用域中的变量，会使用它们的当前作用域替换更加全局的作用域，从而隐藏更加全局的作用域中的变量。
 
 ### <p style="background:orange">&nbsp;使用原型创建 JavaScript 对象</p>
 
+JavaScript 对象是基于原型的，而当今其他广泛使用的语言全部都使用基于类的对象。
+
+<span style="color:red">区别：</span>
+
+- 在基于类的系统中，定义对象：使用类来描述它是什么样子的。
+	
+		类比：如果建筑是基于类的系统，则建筑师会先画出房子的蓝图，然后房子都按照蓝图来建造；
+
+- 在基于原型的系统中，我们创建的对象，看起来要像我们想要的所有这种类型的对象那样，然后告诉JavaScript引擎，我们想要更多像这样的对象。
+		
+		类比：如果建筑是基于原型的系统，则建筑师先建一所房子，然后将房子都建成像这种模样的。
+
+<span style="color:#ac4a4a">**简单对象创建：类和原型的比较**</span>
+
+![类和原型的比较]()
+
+- 基于原型的对象更简单，并且当只有一个对象实例时，编写更快，只要在适当的地方简单地定义它就行了，它也支持更复杂的使用情况，使多个对象共享相似的特性。
+- 在基于类的系统中，你得先定义类，定义构造函数，然后实例化对象，该对象是这个类的实例。
+
+<span style="color:#ac4a4a">**多个对象：类和原型的比较**</span>
+
+##### [*基于类的*]：
+
+	/* step 1：定义类*/
+	public class Prisoner {
+		public int sentence = 4;
+		public int probation = 2;
+		public String name;
+		public String id;
+		
+		/* step 2：定义类的构造函数*/
+		public Prisoner( String name, String id ) {
+			this.name = name;
+			this.id = id;
+		}
+		
+		public static void main( String []args ) {
+			/* step 3：实例化对象*/
+			Prisoner firstPrisoner = new Prisoner("Joe", "12A");
+	
+			Prisoner secondPrisoner = new Prisoner("Sam", "2BC");
+			
+			System.out.println(firstPrisoner.name);
+		}
+	}
+
+##### [*基于原型的*]：
+	
+	// step 1：定义原型对象
+	var proto = {
+		sentence : 4,
+		probation : 2
+	};
+	
+	// step 2：定义对象的构造函数
+	var Prisoner = function(name, id) {
+		this.name = name;
+		this.id = id;
+	}
+	
+	// step 3：将构造函数关联到原型
+	Prisoner.prototype = proto;
+	
+	// step 4：实例化对象
+	var firstPrisoner = new Prisoner('Joe', '12A');
+	var secondPrisoner = new Prisoner('Sam', '2BC');
+
+<span style="background:yellow">补充说明：</span>
+
+1）在每个方法中，首先创建了 `对象的模版`，作为创建对象的结构。模板在基于类的编程中叫做 `类`，在基于原型的编程中叫作 `原型对象`。
+
+2）然后，创建了 `构造函数`。在基于类的语言中，构造函数是在类的内部定义的，这样的话，当实例化对象时，哪个构造函数与哪个类匹配，就很清晰了。在 JavaScript 中，对象的构造函数和原型是分开设置的，所以不需要额外多一步来将它们连接在一起。
+
+3）最后，实例化对象。
+
+> JavaScript 使用了 `new` 操作符，违背了它基于原型的核心思想，可能是试图让熟悉基于类继承的开发人员更容易理解。用 `Object.create` 方法作为 `new` 操作符的替代方案，来创建 JavaScript 对象，能增添一种更像是基于原型的感觉。
+
+	/**
+	 * Object.create() 方法：
+	 * 把原型作为参数并返回一个对象，使用这种方式，可以在原型对象上定义共同的属性和方法，
+	 * 然后使用它来创建多个共享相同属性的对象。
+	 */
+	var proto = {
+		sentenct : 4,
+		probation : 2
+	}
+	
+	var firstPrisoner = Object.create( proto );
+	firstPrisoner.name = 'Joe';
+	firstPrisoner.id = '12A';
+	
+	var secondPrisoner = Object.create( proto );
+	secondPrisoner.name = 'Sam';
+	secondPrisoner.id = '2BC';
+
+Object.create() 的改进方案：使用工厂函数来创建并返回最终的对象。
+
+	/**
+	 * 使用 Object.create() 和工厂函数
+	 */
+	var proto = {
+		sentenct : 4,
+		probation : 2
+	}
+	
+	var makePrisoner = function( name, id ) {
+	
+		var prisoner = Object.create( proto );
+		prisoner.name = name;
+		prisoner.id = id;
+	
+		return prisoner;
+	}
+	
+	var firstPrisoner = makePrisoner( 'Joe', '12A' );
+	
+	var secondPrisoner = makePrisoner( 'Sam', '2BC' );
+
+>  Object.create() 方法：创建对象的最佳方法，它清晰地说明了原型是如何被设置的（有兼容性问题）。
+>  
+>  `new` 操作符：创建对象的最常用方法，但是它遮掩了原型系统的细微差别。
+
+	// Cross-browser method to support Object.create()
+
+	var objectCreate = function ( arg ) {
+		if ( ! arg ) { return {}; }
+		function obj() {};
+		obj.prototype = arg;
+		return new obj;
+	};
+	
+	Object.create = Object.create || objectCreate;
+
 ### <p style="background:orange">&nbsp;编写自执行匿名函数</p>
 
+##### <p style="background: #cfc9fa">1. 函数和匿名函数：</p>
+
+	// 声明函数
+	function prison () {}
+
+	// 使用变量来保存函数
+	var prison = function prison () {};
+
+	// 用局部变量来保存的匿名函数
+	var prison = function () {};
+
+	// 调用方式都相同
+	prison();
+
+##### <p style="background: #cfc9fa">2. 自执行匿名函数：</p>
+
+<span style="background:yellow">抛出问题</span>：在 JavaScript 中，在全局作用域中定义的所有东西在每个地方都是可用的。有时候你不想和所有人共享，不想第三方库共享它们的内部变量，因为这很容易覆盖对象的库，从而导致难以诊断的问题。
+
+<span style="background:yellow">解决方法</span>：
+
+- 1）把整个程序封装在函数中，然后调用这个函数，这样外部代码就不能访问到变量了——>冗长和不灵活；
+
+- 2）自执行匿名函数（因为定义它时没有名字并且没有保存给变量，但却立即执行了）——>推荐。
+
+![显式调用和自执行函数的比对]()
+
+<span style="color:red">优点：</span>用来控制变量的作用域，阻止变量泄漏到代码的其他地方。
+
+<span style="color:red">用途：</span>可用于创建 JavaScript 插件，不会和应用代码冲突，因为它不会向全局名字空间添加任何变量。
+
+##### [*给匿名函数传参和普通函数传参对比*]：
+
+	// 普通函数传参
+	var eatFunction = function (what_to_eat) {
+		var sentence = 'I am going to eat a ' + what_to_eat;
+		console.log( sentence );
+	}
+	
+	eatFunction( 'sandwich' );	// I am going to eat a sandwich
+	
+	
+	// 自执行匿名函数传参
+	(function (what_to_eat) {
+		var sentence = 'I am going to eat a ' + what_to_eat;
+		console.log( sentence );
+	})('hotdog');	// I am going to eat a hotdog
+
+##### [*常用例子*]：
+
+	// 保证函数作用域里面，$ 是 jQuery 对象
+	( function ( $ ) {
+		console.log( $ );
+	} )( jQuery );	
+
 ### <p style="background:orange">&nbsp;使用模块模式和私有变量</p>
+
+<span style="background:yellow">抛出问题</span>：虽然我们可以把应用封装在自执行匿名函数中，使应用免受第三方库（和我们自己）的影响，但是单页应用和庞大，不能定义在一个文件中。
+
+<span style="background:yellow">解决思路</span>：将文件分成一个个的模块，每个模块都有它们自己的私有变量。
+
+	/**
+	 * 在全局作用域中只添加了 prison 变量 
+	 * 匿名函数没有保存在 prison 变量中，因为匿名函数被执行了
+	 * 匿名函数的返回值保存在 prison 中
+	 */
+	var prison = (function () {
+		var prisoner_name = 'Mike Mikowski',
+			jail_term = '20 year term';
+	
+		return {
+			prisoner: prisoner_name + ' - ' + jail_term,
+			sentence: jail_term
+		}
+	})();
+	
+	console.log( prison.prisoner_name );	// "undefined"
+	
+	console.log( prison.prisoner );	// "Mike Mikowski - 20 year term"
+	
+	console.log( prison.sentence );	// "20 year term"
+
+在稍大一点的模块中，减少全局变量是很重要的。
+
+> 一旦自执行匿名函数停止执行，在它里面定义的变量没有了，所以它们是不能被更改的，所以它们无法通过 prison 变量访问到。它们用来定义匿名函数的返回对象上的 prison 和 sentence 属性，并且这些属性可以在 prison 变量上访问到。
 
 ### <p style="background:orange">&nbsp;探索闭包的乐趣和好处</p>
