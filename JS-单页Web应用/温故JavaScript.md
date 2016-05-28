@@ -329,8 +329,7 @@ Object.create() 的改进方案：使用工厂函数来创建并返回最终的�
 
 <span style="background:yellow">解决思路</span>：将文件分成一个个的模块，每个模块都有它们自己的私有变量。
 
-	/**
-	 * 在全局作用域中只添加了 prison 变量 
+	/** 
 	 * 匿名函数没有保存在 prison 变量中，因为匿名函数被执行了
 	 * 匿名函数的返回值保存在 prison 中
 	 */
@@ -341,7 +340,7 @@ Object.create() 的改进方案：使用工厂函数来创建并返回最终的�
 		return {
 			prisoner: prisoner_name + ' - ' + jail_term,
 			sentence: jail_term
-		}
+		};
 	})();
 	
 	console.log( prison.prisoner_name );	// "undefined"
@@ -349,9 +348,225 @@ Object.create() 的改进方案：使用工厂函数来创建并返回最终的�
 	console.log( prison.prisoner );	// "Mike Mikowski - 20 year term"
 	
 	console.log( prison.sentence );	// "20 year term"
+	
+	/**
+	 * jail_pterm 不是 prison 对象或者原型上的属性，它是执行环境中创建的对象变量
+	 * prison 变量保存了这个变量，并且执行环境已不复存在，因为函数已经执行结束。
+	 */
+	console.log( prison.jail_term );	// "undefined"
+	
+	prison.jail_term = 'Sentence commuted';
+	console.log( prison.jail_term );	// "Sentence commuted"
+	
+	console.log( prison.prisoner );	// "Mike Mikowski - 20 year term"
 
-在稍大一点的模块中，减少全局变量是很重要的。
+- 在稍大一点的模块中，<span style="background:yellow">减少全局变量</span>是很重要的。
 
-> 一旦自执行匿名函数停止执行，在它里面定义的变量没有了，所以它们是不能被更改的，所以它们无法通过 prison 变量访问到。它们用来定义匿名函数的返回对象上的 prison 和 sentence 属性，并且这些属性可以在 prison 变量上访问到。
+- 一旦自执行匿名函数停止执行，在它里面定义的变量没有了，所以它们是不能被更改的，所以它们无法通过 prison 变量访问到。它们用来定义匿名函数的返回对象上的 prison 和 sentence 属性，并且这些属性可以在 prison 变量上访问到。
+
+- `prisoner_name` 和 `jail_term` 这些属性只在匿名函数执行时设置了一次，永远不会被更新。它们像是 `prison` 对象的私有变量，只能通过匿名函数返回的对象上的方法来访问，不能在该对象或者原型上直接访问。
+
+- 为了能更新“私有变量”，我们必须<span style="background:yellow">把属性转变为方法，每次调用它们时都会访问变量。</span>
+
+		var prison = (function () {
+			var prisoner_name = 'Mike Mikowski',
+				jail_term = '20 year term';
+		
+			return {
+				prisoner: function () {
+					return prisoner_name + ' - ' + jail_term;
+				},
+				setJailTerm: function ( term ) {
+					jail_term = term;
+				}
+			};
+		})();
+		
+		console.log( prison.prisoner() );	// "Mike Mikowski - 20 year term"
+		
+		prison.setJailTerm( 'Sentence commuted' );
+		
+		console.log( prison.prisoner() ); // "Mike Mikowski - Sentence commuted"
 
 ### <p style="background:orange">&nbsp;探索闭包的乐趣和好处</p>
+
+##### <p style="background: #cfc9fa">1. 什么是闭包：</p>
+
+JavaScript 有 <span style="color:red">`垃圾回收器`</span>：当函数执行完毕时，管理内存的本地方法会将函数中所有创建了的东西从内存中移除。
+
+<span style="color:red">闭包</span>是阻止垃圾回收器将变量从内存中移除的方法，使得在创建变量的执行环境的外面能够访问到该变量。
+
+	var prison = (function () {
+		var prisoner = 'Josh Powell';
+	
+		/**
+		 * 在 prisoner 函数被保存到 prison 对象上时，一个闭包就创建了。
+		 * 闭包因保存函数而被创建，在执行环境的外面，可以动态访问 prisoner 变量，
+		 * 这就阻止了垃圾回收器将 prisoner 变量从内存中移除。
+		 */
+		return {
+			prisoner: function () {
+				return prisoner;
+			}
+		};
+	})();
+
+	prison.prisoner();	// "Josh Powell"
+
+##### [*闭包示例1*]：
+
+	var makePrisoner = function ( prisoner ) {
+		return function () {
+			return prisoner;
+		}
+	};
+	
+	var joshPrison = makePrisoner( 'Josh Powell' );
+	var mikePrison = makePrisoner( 'Mike Mikowski' );
+	
+	console.log( joshPrison() );	// "Josh Powell"
+	console.log( mikePrison() );	// "Mike Mikowski"
+
+##### [*闭包示例2*]：<span style="color:#ac4a4a">**保存变量以便在 Ajax 请求返回时使用。**</span>
+
+	/**
+	 * 当使用 JavaScript 对象中的方法时，this 指向这个对象。
+	 */
+	var prison = {
+		names: 'Mike Mikowski and Josh Powell',
+		who: function () {
+			return this.names;
+		}
+	};
+	
+	prison.who();	// "Mike Mikowski and Josh Powell"
+
+	/**
+	 * 如果是 jQuery 来发送 Ajax 请求的方法，则 this 不再指向对象，它指向 Ajax 请求对象
+	 */
+	var prison = {
+		names: 'Mike Mikowski and Josh Powell',
+		who: function () {
+			$.ajax({
+				success: function () {
+					console.log( this.names );
+				}
+			});
+		}
+	};
+	// 'this' is the ajax object
+	prison.who();	// "undefined"
+
+<span style="background:yellow">闭包由函数创建</span>，该函数在当前执行环境中访问了某个变量，并将该函数保存给当前执行环境外的一个变量。
+
+##### [*闭包示例3*]：<span style="color:#ac4a4a">**通过把 this 保存给 that，在函数中访问 that，从而创建了一个闭包**</span>
+
+	var prison = {
+		names: 'Mike Mikowski and Josh Powell',
+		who: function () {
+			var that = this;
+			$.ajax({
+				success: function () {
+					console.log( that.names );
+				}
+			});
+		}
+	};
+	
+	/**
+	 * 尽管在 Ajax 请求返回的时候，who() 已经执行完毕，但是 that 变量不会被垃圾回收
+	 * 在 success 方法中可以使用该变量
+	 */
+	prison.who();	// "Mike Mikowski and Josh Powell"
+
+##### <p style="background: #cfc9fa">2. 闭包是如何工作的：</p>
+
+参看[闭包示例1]，当调用 makePrison 时，为这次特定的调用创建了一个执行环境对象，将传入的值赋予 prisoner。
+
+##### [*闭包示例4*]：
+
+	var curryLog, logHello, logGoodbye;
+	
+	curryLog = function ( arg_text ) {
+		var log_it = function () { console.log( arg_text ); }
+		return log_it;
+	};
+	
+	logHello = curryLog('hello');
+	logGoodbye = curryLog('goodbye');
+	
+	curryLog('fred')();	// 'fred'
+	
+	logHello();	// 'hello'
+	logGoodbye();	// 'goodbye'
+	
+	delete window.logGoodbye;	// 通过 var 声明的变量是不能通过 delete 操作符来删除的
+	
+	logGoodbye();	// 'goodbye'
+
+<span style="color:red">注意：</span>
+
+1）每次调用函数时都会创建一个唯一的执行环境对象。
+
+2）执行环境对象是 JavaScript 引擎的一部分，在 JavaScript 中不能直接访问。
+
+3）函数执行完后，执行对象就会被丢弃，除非调用者引用了它。
+
+4）如果函数返回的是数字，就不能引用函数的执行环境对象。但是，如果函数返回的是一个更复杂的结构，像是函数、对象或者数组，将返回值保存到一个变量上（有时是误用），就创建了一个对执行环境的引用。
+
+##### [*闭包示例5*]：
+
+	var menu, outer_function,
+		food = 'cake';
+	
+	outer_function = function () {
+		var fruit, inner_function;
+	
+		fruit = 'apple';
+	
+		inner_function = function () {
+			return {
+				food: food,
+				fruit: fruit
+			};
+		}
+	
+		return inner_function;
+	};
+	
+	menu = outer_function();
+	
+	menu();	// {food: "cake", fruit: "apple"}
+
+<span style="background:yellow">解释说明：</span>
+
+- 当调用 `outer_function` 时，创建了一个执行环境。
+
+- 在这个执行环境中定义了 `inner_function`，因为在 `outer_function` 执行环境里面定义了 `inenr_function`，它有权限访问 `outer_function` 作用域内的所有变量，这里是 `food`、`fruit`、`outer_function`、`inner_function` 和 `menu`。
+
+- 当 `outer_function` 执行完时，你可能期望在执行环境中的所有东西都会被垃圾回收期销毁。——>错！
+
+- 然而，因为 `inner_function` 的引用保存给了全局作用域中的变量 `menu`，所以它并不会被销毁。
+
+- 在声明 `inner_function` 的作用域内，需要保留对所有变量的访问权限，它“关闭”了 `outer_function` 执行环境的大门，阻止垃圾回收器来移除它们。
+
+- 这就是闭包！！！！！
+
+
+##### [*闭包示例6*]：
+
+	function sendAjaxRequest() {
+		var scoped_var = 'yay';
+		$.ajax({
+			success: function () {
+				console.log(scoped_var);
+			}
+		});
+	}
+	
+	sendAjaxRequest();	// 当 Ajax 请求成功完成时，输出 'yay'
+
+<span style="background:yellow">问</span>：为什么在 Ajax 请求返回后，scope_var 还是可以访问的？
+
+<span style="background:yellow">答</span>：因为 `success` 方法是在调用 `sendAjaxRequest` 时创建的执行环境中定义的，此时 `scoped_var` 在作用域中。
+
