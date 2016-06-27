@@ -24,7 +24,7 @@
 
 在 JavaScript 中，当变量被声明时，声明会被提升到它所在函数的顶部，并被赋予 undefined 值。这就使得在函数的任意位置声明的变量存在于整个函数中，尽管在赋值之前，它的值一直为 undefined。
 
-![变量提升1](https://github.com/RukiQ/blog-learning-patch/blob/master/JS-%E5%8D%95%E9%A1%B5Web%E5%BA%94%E7%94%A8/img/%E5%8F%98%E9%87%8F%E6%8F%90%E5%8D%871.png?raw=true)
+<img width="600" height="200" alt="变量提升1" src="https://github.com/RukiQ/blog-learning-patch/blob/master/JS-%E5%8D%95%E9%A1%B5Web%E5%BA%94%E7%94%A8/img/%E5%8F%98%E9%87%8F%E6%8F%90%E5%8D%871.png?raw=true">
 	
 	function prison () {
 	    console.log(prisoner);  // "undefined"
@@ -94,7 +94,7 @@ JavaScript 引擎在进入作用域时，会对代码分两轮处理：（1）�
 
 > **参数被赋值了**，因为在向函数传递参数之前，任何决定参数值的代码都可以运行了。
 
-![第一轮初始化变量](https://github.com/RukiQ/blog-learning-patch/blob/master/JS-%E5%8D%95%E9%A1%B5Web%E5%BA%94%E7%94%A8/img/%E7%AC%AC%E4%B8%80%E8%BD%AE%E5%88%9D%E5%A7%8B%E5%8C%96%E5%8F%98%E9%87%8F.png?raw=true)
+<img width="600" height="240" alt="第一轮初始化变量" src="https://github.com/RukiQ/blog-learning-patch/blob/master/JS-%E5%8D%95%E9%A1%B5Web%E5%BA%94%E7%94%A8/img/%E7%AC%AC%E4%B8%80%E8%BD%AE%E5%88%9D%E5%A7%8B%E5%8C%96%E5%8F%98%E9%87%8F.png?raw=true">
 
 <span style="color:#ac4a4a">**执行环境和执行环境对象**——>理解 javaScript 引擎在第一轮是如何保存变量的</span>
 
@@ -112,11 +112,11 @@ JavaScript 引擎把变量作为一个属性保存在一个对象上，这个对
 
 在 JavaScript 引擎中，<span style="color:red">`执行环境对象`</span> 是一种对象，属于 JavaScript 实现层面的东西，在开发的时候无法直接访问。<span style="background:yellow">间接地访问执行环境对象</span>是很容易的，因为每次使用变量，就是在访问执行环境对象的属性。
 
-![执行环境对象](https://github.com/RukiQ/blog-learning-patch/blob/master/JS-%E5%8D%95%E9%A1%B5Web%E5%BA%94%E7%94%A8/img/%E6%89%A7%E8%A1%8C%E7%8E%AF%E5%A2%83%E5%AF%B9%E8%B1%A1.png?raw=true)
+<img width="600" height="150" alt="执行环境对象" src="https://github.com/RukiQ/blog-learning-patch/blob/master/JS-%E5%8D%95%E9%A1%B5Web%E5%BA%94%E7%94%A8/img/%E6%89%A7%E8%A1%8C%E7%8E%AF%E5%A2%83%E5%AF%B9%E8%B1%A1.png?raw=true">
 
 由于可以在执行环境中调用函数，会产生很多层的深度。在执行环境中调用函数，会创建一个新的嵌套在已存在的执行环境内的执行环境。
 
-![调用函数会创建一个执行环境](https://github.com/RukiQ/blog-learning-patch/blob/master/JS-%E5%8D%95%E9%A1%B5Web%E5%BA%94%E7%94%A8/img/%E8%B0%83%E7%94%A8%E5%87%BD%E6%95%B0%E4%BC%9A%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E6%89%A7%E8%A1%8C%E7%8E%AF%E5%A2%83.png?raw=true)
+<img width="600" height="400" alt="调用函数会创建一个执行环境" src="https://github.com/RukiQ/blog-learning-patch/blob/master/JS-%E5%8D%95%E9%A1%B5Web%E5%BA%94%E7%94%A8/img/%E8%B0%83%E7%94%A8%E5%87%BD%E6%95%B0%E4%BC%9A%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E6%89%A7%E8%A1%8C%E7%8E%AF%E5%A2%83.png?raw=true">
 
 JavaScript 引擎在执行环境对象中访问作用域内的变量，查找的顺序叫作 `作用域链`，它和 `原型链` 一起，描述了 JavaScript 访问变量和属性的顺序。
 
@@ -148,7 +148,7 @@ JavaScript 对象是基于原型的，而当今其他广泛使用的语言全部
 
 <span style="color:#ac4a4a">**简单对象创建：类和原型的比较**</span>
 
-![类和原型的比较]()
+<img width="600" height="200" alt="类和原型的比较" src="https://github.com/RukiQ/blog-learning-patch/blob/master/JS-%E5%8D%95%E9%A1%B5Web%E5%BA%94%E7%94%A8/img/%E7%B1%BB%E5%92%8C%E5%8E%9F%E5%9E%8B%E7%9A%84%E6%AF%94%E8%BE%83.png?raw=true">
 
 - 基于原型的对象更简单，并且当只有一个对象实例时，编写更快，只要在适当的地方简单地定义它就行了，它也支持更复杂的使用情况，使多个对象共享相似的特性。
 - 在基于类的系统中，你得先定义类，定义构造函数，然后实例化对象，该对象是这个类的实例。
@@ -293,7 +293,8 @@ Object.create() 的改进方案：使用工厂函数来创建并返回最终的�
 
 - 2）自执行匿名函数（因为定义它时没有名字并且没有保存给变量，但却立即执行了）——>推荐。
 
-![显式调用和自执行函数的比对]()
+
+<img width="600" height="160" alt="显式调用和自执行函数的比对" src="https://github.com/RukiQ/blog-learning-patch/blob/master/JS-%E5%8D%95%E9%A1%B5Web%E5%BA%94%E7%94%A8/img/%E6%98%BE%E5%BC%8F%E8%B0%83%E7%94%A8%E5%92%8C%E8%87%AA%E6%89%A7%E8%A1%8C%E5%87%BD%E6%95%B0%E7%9A%84%E5%AF%B9%E6%AF%94.png?raw=true">
 
 <span style="color:red">优点：</span>用来控制变量的作用域，阻止变量泄漏到代码的其他地方。
 
