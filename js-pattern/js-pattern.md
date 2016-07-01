@@ -175,3 +175,45 @@ JS 五种类型不是对象：数值类型（number）、字符串类型（strin
 >
 > 此外，如果函数使用了不同的名称，比如分配给不同的变量或者以对象的方法来使用，那么重定义部分将永远不会发生，并且将会执行原始函数体
 
+### <p style="background:orange;">第五章 对象创建模式</p>
+
+JavaScript 是一种简介明了的语言，并没有其他语言中经常使用的一些特殊语法特征，如	`命名空间`、`模块`、`包`、`私有属性` 以及 `静态成员` 等语法。
+
+但是通过常见的模式，可以实现、替换其他语言中的语法特征。
+
+##### 1. 命名空间模式
+
+<span style="color:red">优点：</span>有助于减少程序中所需要的全局变量的数量，并且同时还有助于避免冲突或过长的名字前缀。
+
+	// 全局变量
+	var MYAPP = {};
+	
+	// 构造函数
+	MYAPP.Parent = function() {};
+	MYAPP.Child = function() {};
+	
+	// 一个变量
+	MYAPP.some_var = 1;
+	
+	// 一个对象容器
+	MYAPP.modules = {};
+	
+	// 嵌套对象
+	MYAPP.modules.module1 = {};
+	MYAPP.modules.module1.data = {a: 1, b: 2};
+	MYAPP.modules.module2 = {};
+
+<span style="color:red">缺点：</span>
+
+- 需要输入更多的字符，变量加前缀，增加代码量；
+- 仅有一个全局实例，任意部分的代码都可以修改它；
+- 长嵌套名字，更长的属性解析查询时间。
+
+<span style="color:red">解决方案：</span>沙箱模式
+
+##### 2. 声明依赖模式
+
+ 
+
+##### 3. 模块模式
+##### 4. 沙箱模式
