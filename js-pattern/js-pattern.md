@@ -183,8 +183,6 @@ JavaScript 是一种简介明了的语言，并没有其他语言中经常使用
 
 ##### 1. 命名空间模式
 
-<span style="color:red">优点：</span>有助于减少程序中所需要的全局变量的数量，并且同时还有助于避免冲突或过长的名字前缀。
-
 	// 全局变量
 	var MYAPP = {};
 	
@@ -203,6 +201,8 @@ JavaScript 是一种简介明了的语言，并没有其他语言中经常使用
 	MYAPP.modules.module1.data = {a: 1, b: 2};
 	MYAPP.modules.module2 = {};
 
+<span style="color:red">优点：</span>有助于减少程序中所需要的全局变量的数量，并且同时还有助于避免冲突或过长的名字前缀。
+
 <span style="color:red">缺点：</span>
 
 - 需要输入更多的字符，变量加前缀，增加代码量；
@@ -213,7 +213,126 @@ JavaScript 是一种简介明了的语言，并没有其他语言中经常使用
 
 ##### 2. 声明依赖模式
 
- 
+	var myFunction = function() {
+	  // 依赖
+	  var event = YAHOO.util.Event,
+	      dom = YAHOO.util.Dom;
+	
+	  // 使用事件和DOM变量
+	  // 下面的函数...
+	}
 
-##### 3. 模块模式
-##### 4. 沙箱模式
+<span style="color:red">优点：</span>
+
+- 显示的依赖声明表明了特定脚本文件已经包含在该页面中；
+- 在函数顶部的前期声明可以很容易发现并解析依赖；
+- 解析局部变量的速度总是要比解析全局变量（或全局变量的嵌套属性）快，提升性能；
+- 利用工具可以重命名局部变量，会生成更小的代码量。
+
+##### 3. 私有属性和方法
+
+JavaScript 中所有对象的成员是公共的。
+
+`私有成员`：利用 `闭包` 实现。
+
+`特权方法`：指可以访问私有成员的公共方法，因为它具有访问私有属性的“特殊”权限。
+
+`私有性失效`：从特权方法中返回一个私有变量，且该变量恰好是一个*对象或者数组*，那么外面的代码仍然可以访问该私有变量，因为它通过引用传递。
+
+###### 1）使用构造函数获得私有性	
+
+	/**
+	 * 利用闭包实现私有成员
+	 */
+	function Gadget() {
+	  // 私有成员
+	  var name = "iPod";
+	  var color = ['red'];
+	
+	  // 公有函数
+	  this.getName = function() {
+	    return name;
+	  };
+	
+	  // 反模式
+	  // 不要传递需要保持私有性的对象和数组的引用
+	  this.getColor = function() {
+	    return color;
+	  };
+	
+	}
+	
+	var toy = new Gadget();
+	
+	console.log(toy.name); // 'undefined'
+	console.log(toy.getName());  // 'iPod'
+	
+	var newColor = toy.getColor();
+	newColor[0] = 'black';
+	console.log(toy.getColor());  // 'black'
+
+> 缺点：当将私有成员与构造函数一起使用时，每次调用构造函数以创建对象时，这些私有成员都会被重新创建。
+>
+> 解决方案：使用原型共享常用属性和方法，另外，还可以在多个实例中共享隐藏的实例成员。    
+
+###### 2）模块模式的基础框架：对象字面量以及私有性
+
+	/**
+	 * 使用对象字面量+匿名函数实现私有成员
+	 */
+	var myobj;
+	(function() {
+	  // 私有成员
+	  var name = 'my, oh my';
+	
+	  // 实现公有部分
+	  // 注意，没有 'var' 修饰符
+	  myobj = {
+	    // 特权方法
+	    getName: function() {
+	      return name;
+	    }
+	  }
+	}());
+	
+	myobj.getName();  // 'my, oh my'
+	
+	/**
+	 * 实现2
+	 */
+	var myobj = (function() {
+	  // 私有成员
+	  var name = 'my, oh my';
+	
+	  // 实现公有部分
+	  return {
+	    getName: function() {
+	      return name;
+	    }
+	  }
+	}());
+	
+	myobj.getName();  // 'my, oh my'
+
+
+##### 4. 模块模式
+
+
+##### 5. 沙箱模式
+
+##### 6. 静态成员
+
+
+##### 7. 对象常亮
+
+
+##### 8. 链模式
+
+
+##### 9. method() 方法
+
+
+---
+
+##### 私有属性和方法
+
