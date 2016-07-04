@@ -554,3 +554,177 @@ JavaScript 中所有对象的成员是公共的。
 	  };
 	}
 
+
+### <p style="background:orange;">第六章 代码复用模式</p>
+
+> GoF 在其著作中提出的有关创建对象的建议原则：
+> 
+> 优先使用对象组合，而不是类继承。
+
+- 传统模式：使用类继承；
+- 现代模式：“类式继承”，不以类的方式考虑。
+
+##### 使用类式继承时的预期结果
+	
+	// 父构造函数
+	function Parent(name) {
+	  this.name = name || 'Adam';
+	}
+	
+	Parent.prototype.say = function() {
+	  return this.name;
+	}
+	
+	// 空白的子构造函数
+	function Child(name) {}
+	
+	// 继承
+	inherit(Child, Parent);
+
+##### 类式继承#1——默认模式
+
+	function inherit(C, P) {
+	  C.prototype = new P();
+	}
+	
+	var kid = new Child();
+	kid.say();  // 'Adam'
+
+<span style="color:red">缺点：</span>1）同时继承了两个对象的属性，即添加到 `this` 的属性以及原型属性。2）不支持参数传递。
+
+##### 类式继承#2——借用构造函数
+
+	function Child(name) {
+	  Parent.apply(this, arguments);
+	}
+	
+	var kid = new Chlid('Patrick');
+	kid.name; // 'Patrick'
+	typeof kid.say; // 'undefined'
+
+<span style="color:red">优点：</span>解决了从子构造函数到父构造函数的参数传递问题，可获得父对象自身成员的真实副本。
+
+<span style="color:red">缺点：</span>无法从原型中继承任何东西，并且原型也仅是添加可重用方法及属性的位置，它并不会为每个实例重新创建原型。
+
+##### 类式继承#3——借用和设置原型
+
+> 主要思想：结合前两种模式，先借用构造函数，然后设置子构造函数的原型使其指向一个构造函数创建的新实例。
+	
+	function Chlid(name) {
+	  Parent.apply(this, arguments);
+	}
+	
+	Child.prototype = new Parent(); // 第一次调用
+	
+	var kid = new Chlid('Patrick'); // 第二次调用
+	kid.name; // 'Patrick'
+	kid.say();  // 'Patrick'
+	delete kid.name;
+	kid.say();  // 'Adam'
+
+<span style="color:red">缺点：</span>需要两次调用父构造函数。
+
+##### 类式继承#4——共享原型
+
+> 经验法则：可复用成员应该转移到原型中而不是放置在 this 中。
+
+	function inherit(C, P) {
+	  C.prototype = P.ptototype;
+	}
+
+<span style="color:red">优点：</span>不需要两次调用父构造函数。
+
+<span style="color:red">缺点：</span>如果在继承链下方的某处存在一个子对象或者孙子对象修改了原型，它将会影响到所有的父对象和祖先对象。
+
+##### 类式继承#5——临时构造函数（代理函数或代理构造函数模式）
+
+> 通过断开父对象与子对象的原型之间的直接链接关系，从而解决共享同一个原型所带来的问题，同时还能够继续受益于原型链带来的好处。
+
+	function inherit(C, P) {
+	  var F = function() {};
+	  F.prototype = P.prototype;
+	  C.prototype = new F();
+	
+	  // 存储超类
+	  C.uber = P.ptototype;
+	
+	  // 重置构造函数指针
+	  C.prototype.constructor = C;
+	}
+	
+	var kid = new Child();
+	
+	/**
+	 * 优化：避免在每次需要继承时都创建临时（代理）构造函数
+	 */
+	var inherit = (function() {
+	  var F = function() {};
+	  return function(C, P) {
+	    F.prototype = P.prototype;
+	    C.prototype = new F();
+	    C.uber = P.prototype;
+	    C.prototype.constructor = C;
+	  }
+	}());
+
+
+##### Klass
+
+##### 原型继承
+
+	/**
+	 * 使用字面量创建父对象
+	 */
+	var parent = {
+	  name: 'Papa'
+	};
+	
+	function object(o) {
+	  function F() {};
+	  F.prototype = o;
+	  return new F();
+	}
+	
+	// 新对象
+	var child = object(parent);
+	
+	/**
+	 * 使用构造函数创建父对象
+	 */
+	function Person() {
+	  this.name = 'Adam';
+	}
+	
+	Person.prototype.getName = function() {
+	  return this.name;
+	}
+	
+	/**
+	 * 继承方法1
+	 */
+	var papa = new Person();
+	var kid = object(papa);
+	kid.getName();  // 'Adam'
+	
+	/**
+	 * 继承方法2：
+	 * 仅继承现有构造函数的原型对象
+	 */
+	var kid2 = object(Person.prototype);
+	
+	typeof kid.getName;   // 'function'
+	typeof kid.name;  // 'undefined'
+	
+	/**
+	 * 继承方法3：
+	 * 使用 Object.create()，可以扩展新对象自身的属性，并返回该新对象
+	 */
+	var child = Object.create(parent);
+	var child2 = Object.create(parent, {
+	  age: {value: 2}
+	})
+	child2.hasOwnProperty('age'); // true
+
+##### 通过复制属性实现继承
+
+##### 借用方法
