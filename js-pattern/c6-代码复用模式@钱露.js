@@ -135,6 +135,9 @@ child2.hasOwnProperty('age'); // true
 
 
 //========================== 7.通过复制属性实现继承 ==========================
+/**
+ * 浅复制
+ */ 
 function extend(parent, child) {
   var i;
   child = child || {};
@@ -145,3 +148,147 @@ function extend(parent, child) {
   }
   return child;
 }
+
+var dad = {name: 'Adam'};
+var kid = extend(dad);
+kid.name; // 'Adam'
+
+/**
+ * 深复制
+ */ 
+function extendDeep(parent, child) {
+  var i,
+      toStr = Object.prototype.toString,
+      astr = '[object Array]';
+
+  child = child || {};
+
+  for (i in parent) {
+    if (parent.hasOwnProperty(i)) {
+      if (typeof parent[i] === 'object') {
+        child[i] = (toStr.call(parent[i]) === astr) ? [] : {};
+        extendDeep(parent[i], child[i]);
+      } else {
+        child[i] = parent[i];
+      }
+    }
+  }
+  return child;
+}
+
+// 测试
+var dad = {
+  counts: [1, 2, 3],
+  reads: {paper: true}
+};
+var kid = extendDeep(dad);
+
+kid.counts.push(4);
+kid.counts.toString();  // '1,2,3,4'
+dad.counts.toString();  // '1,2,3'
+
+
+//========================== 8.混入模式 ==========================
+function mix() {
+  var arg, prop, child = {};
+  for (arg = 0; arg < arguments.length; arg += 1) {
+    for (prop in arguments[arg]) {
+      if (arguments[arg].hasOwnProperty(prop)) {
+        child[prop] = arguments[arg][prop];
+      }
+    }
+  }
+  return child;
+}
+
+var cake = mix(
+  {egg: 2, large: true},
+  {butter: 1, salted: true},
+  {flour: '3 cups'},
+  {sugar: 'sure!'}
+);
+
+
+//========================== 9.借用方法 ==========================
+/**
+ * 借用数组的方法
+ */
+function f() {
+  var args = [].slice.call(arguments, 1, 3);
+  // 或者
+  // var args = Array.prototype.slice.call(arguments, 1, 3);
+  return args;
+}
+
+f(1, 2, 3, 4, 5, 6);  // [2, 3] 
+
+/**
+ * 借用和绑定
+ */
+var one = {
+  name: 'object',
+  say: function(greet) {
+    return greet + ', ' + this.name;
+  }
+};
+
+one.say('hi');  // 'hi, object'
+
+var two = {
+  name: 'another object'
+};
+
+one.say.apply(two, ['hello']);  // 'hello, another object'
+one.say.call(two, 'bye'); // "bye, another object"
+var say = one.say.bind(two, 'bind');
+say();  // "bind, another object"
+
+/**
+ * this都指向了全局对象
+ */
+// 给变量赋值
+// `this` 将指向全局变量
+var say = one.say;
+say('hoho'); // 'hoho, '
+
+// 作为回调函数
+var yetanother = {
+  name: 'Yet another object',
+  method: function(callback) {
+    return callback('Hola');
+  }
+};
+yetanother.method(one.say); // 'Hola, '
+
+/**
+ * 解决办法：bind()函数
+ */
+function bind(o, m) {
+  return function() {
+    return m.apply(o, [].slice.call(arguments));
+  };
+}
+
+var twosay = bind(two, one.say);
+twosay('yo'); // 'yo, another object';
+
+/**
+ * Function.prototype.bind()实现
+ */
+if (typeof Function.prototype.bind === 'undefined') {
+  Function.prototype.bind = function(thisArg) {
+    var fn = this, 
+        slice = Array.prototype.slice,
+        args = slice.call(arguments, 1);
+
+    return function() {
+      return fn.apply(thisArg, args.concat(slice.call(arguments)));
+    };
+  };
+}
+
+var twosay2 = one.say.bind(two);
+twosay2('Bonjour'); // 'Bonjour, another object'
+
+var twosay3 = one.say.bind(two, 'Enchante');
+twosay3(); // 'Enchante, another object'
