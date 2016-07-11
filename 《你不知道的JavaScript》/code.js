@@ -1,50 +1,52 @@
-/**
- * eval
- */
-function foo(str, a) {
-  eval( str );  // 欺骗！
-  console.log(a, b);
-}
+var MyModules = (function Manager() {
+  var modules = {};
 
-var b = 2;
-
-foo( 'var b = 3;', 1);  // 1,3
-
-
-/**
- * with
- */
-var obj = { a: 1, b: 2, c: 3 };
-
-// 单调乏味重复的 'obj'
-obj.a = 2;
-obj.b = 3;
-obj.c = 4;
-
-// 简单的快捷方式
-with(obj) {
-  a = 3;
-  b = 4;
-  c = 5;
-}
-
-function foo(obj) {
-  with(obj) {
-    a = 2;
+  function define(name, deps, impl) {
+    for (var i=0; i<deps.length; i++) {
+      deps[i] = modules[deps[i]];
+    }
+    modules[name] = impl.apply(impl, deps);
   }
-}
 
-var o1 = { a: 3 };
+  function get(name) {
+    return modules[name];
+  }
 
-var o2 = { b: 3 };
-
-foo( o1 );  
-o1.a; // 2
-foo( o2 );  
-o2.a; // undefined
-a;  // 2——a被泄露到全局作用域上了
+  return {
+    define: define,
+    get: get
+  };
+})();
 
 
-setTimeout(function timeoutHandler() {
-  //...
-}, 1000);
+// 定义模块
+MyModules.define('bar', [], function() {
+  function hello(who) {
+    return 'Let me introduce: ' + who;
+  }
+
+  return {
+    hello: hello
+  };
+});
+
+MyModules.define('foo', ['bar'], function() {
+  var hungry = 'hippo';
+
+  function awesome() {
+    console.log(bar.hello(hungry).toUpperCase());
+  }
+
+  return {
+    awesome: awesome
+  };
+});
+
+var bar = MyModules.get('bar');
+var foo = MyModules.get('foo');
+
+console.log(
+  bar.hello('hippo')
+);  // Let me introduce: hippo
+
+foo.awesome();  // LET ME INTRODUCE: HIPPO
