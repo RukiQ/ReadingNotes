@@ -289,13 +289,155 @@ JavaScript 环境中内置的 setTimeout() 函数实现和下面的伪代码类�
 	- 使用 `apply(...)` 来“展开”一个数组，并当做参数传入一个函数。
 	- bind(...)可以对参数进行柯里化（预先设置一些参数）。
 
+			function foo(a, b) {
+			  console.log("a:" + a + ", b:" + b);
+			}
+			
+			// 把数组“展开”成参数
+			foo.apply(null, [2, 3]); // a:2, b:3
+			
+			// 在ES6中，可以用...操作符代替apply(...)来“展开”数组
+			foo(...[1,2]);  // a:1, b:2
+			
+			// 使用 bind(...) 进行柯里化
+			var bar = foo.bind(null, 3);
+			bar(4); // a:3, b:4
 
+- 更安全的 `this`：
 
+	- 创建一个空的非委托的对象（`Object.create(null)`）
 
+			function foo(a, b) {
+			  console.log("a:" + a + ", b:" + b);
+			}
+			
+			// 创建DMZ（demilitarized zone,非军事区）空对象
+			var dmzObj = Object.create(null);
+			
+			// 把数组“展开”成参数
+			foo.apply(dmzObj, [2, 3]); // a:2, b:3
+			
+			// 使用 bind(...) 进行柯里化
+			var bar = foo.bind(dmzObj, 3);
+			bar(4); // a:3, b:4
 
-###### ② 间接引用
+> `Object.create(null)` 和 `{}` 很像，但是并不会创建 `Object.prototype` 这个委托，所以它比 {} “更空”。
+
+###### ② 间接引用 —— 函数会应用默认绑定规则。
+
+[ *“间接引用”最容易在赋值时发生* ]：
+
+	function foo() {
+	    console.log(this.a);
+	}
+	
+	var a = 2;
+	var o = {a: 3, foo: foo};
+	var p = {a: 4};
+	
+	o.foo();  // 3
+	
+	/**
+	 * 该赋值表达式的返回值是目标函数的引用
+	 * 因此调用位置是 foo() 而不是 p.foo() 或者 o.foo()
+	 */
+	(p.foo = o.foo)();  // 2
+
 ###### ③ 软绑定
 
+<span style="background:yellow">硬绑定的优点</span>：会把 `this` 强制绑定到指定的对象，防止函数调用应用默认绑定规则。
+
+<span style="background:yellow">硬绑定的缺点</span>：会大大降低函数的灵活性，使用之后就无法使用隐式绑定或者显示绑定来修改 `this`。
+
+<span style="color:red">软绑定</span>：可以给默认绑定指定一个全局对象和 `undefined` 以外的值（同硬绑定），同时保留隐式绑定或者显式绑定修改 `this` 的能力。
+
+	if (!Function.prototype.softBind) {
+	    Function.prototype.softBind = function(obj) {
+	        var fn = this;
+	        // 捕获所有 curried 参数
+	        var curried = [].slice.call(arguments, 1);
+	        var bound = function() {
+	            return fn.apply(
+	                (!this || this === (window || global)) ?
+	                    obj : this,
+	                curried.concat.apply(curried, arguments)
+	            );
+	        };
+	        bound.prototype = Object.create(fn.prototype);
+	        return bound;
+	    }
+	}
+	
+	function foo() {
+	    console.log("name:" + this.name);
+	}
+	
+	var obj = { name: 'obj' },
+	    obj2 = { name: 'obj2' },
+	    obj3 = { name: 'obj3' };
+	
+	/**
+	 * 软绑定
+	 */
+	var fooOBJ = foo.softBind(obj);
+	
+	fooOBJ();   // name: obj
+	
+	obj2.foo = foo.softBind(obj);
+	obj2.foo(); // name: obj2   <---- 看！！！
+	
+	fooOBJ.call(obj3);  // name: obj3   <---- 看！
+	
+	setTimeout(obj2.foo, 10);   // name: obj    <---- 应用了软绑定
+	
+	/**
+	 * 硬绑定
+	 */
+	obj3.foo = foo.bind(obj3);
+	obj3.foo(); // name: obj3 
+	setTimeout(obj3.foo, 10);   // name: obj3
+
+##### ☞ `this` 词法 ——> 箭头函数
+
+`箭头函数` 不使用 `this` 的四种标准规则，而是根据外层（函数或者全局）作用域来决定 `this`。
+
+[ *箭头函数的词法作用域* ]：
+
+	function foo() {
+	    // 返回一个箭头函数
+	    return (a) => {
+	        // this 继承自 foo()
+	        console.log(this.a);
+	    };
+	}
+	
+	var obj1 = {
+	    a: 2
+	};
+	
+	var obj2 = {
+	    a: 3
+	};
+	
+	var bar = foo.call(obj1);
+	bar.call(obj2); // 2，不是3！箭头函数的绑定无法被修改！
+
+[ *箭头函数最常用于回调函数中* ]：
+
+	function foo() {
+	    setTimeout(() => {
+	        // 这里的 this 在此法上继承自 foo()
+	        console.log(this.a);
+	    }, 100);
+	}
+	
+	var obj = {
+	    a: 2
+	};
+	
+	foo.call(obj);  // 2
+
+> 箭头函数可以像 `bind(...)` 一样确保函数的 `this` 被绑定到指定对象，此外，其重要性还体现在它用更常见的词法作用域取代了传统的 `this` 机制。
 
 ### <p style="background:orange;">第3章 对象</p>
 
