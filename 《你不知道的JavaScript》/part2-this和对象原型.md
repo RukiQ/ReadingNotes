@@ -441,8 +441,165 @@ JavaScript 环境中内置的 setTimeout() 函数实现和下面的伪代码类�
 
 ### <p style="background:orange;">第3章 对象</p>
 
-### <p style="background:orange;">第4章 混合对象“类”</p>
+##### ☞ 类型
 
+- 5 种简单基本类型（本身并不是对象）：`string`、`number`、`boolean`、`null`、`undefined`
+
+- 1 种复杂基本类型：对象子类型
+
+- 内置对象：`String`、`Number`、`Boolean`、`Object`、`Function`、`Array`、`Date`、`RegExp`、`Error`
+
+-  JavaScript 中的函数是“一等公民”，因为它们本质上和普通的对象一样（只是可以调用），所以可以像操作其他对象一样操作函数。
+
+- `null` 和 `undefined` 没有对应的构造形式，它们只有文字形式。相反，`Date` 只有构造，没有文字形式。
+
+对于 `Object`、`Array`、`Function`、`RegExp` 来说，无论使用文字形式还是构造形式，它们都是对象，不是字面量。
+
+❶ `null` 是基本类型，但是 `typeof null` 返回的是 `object`，原理如下：不同的对象在底层都表示为二进制，在 JavaScript 中前三位都为 0 的话会被判断为 `object` 类型，`null` 的二进制表示全是 0，自然前三位也是 0，所以执行 `typeof` 时会返回 `object`。
+
+##### ☞ 内容
+
+- 从技术角度来说，函数永远不会“属于”一个对象，只是对于同一个函数的不同引用。
+
+- 数组也是对象，虽然每个下标都是整数，但仍然可以给数组添加属性。但是，如果试图像数组添加一个“看起来”像数字的属性，则它会变成一个数值下标。
+
+		var myArray = ["foo", 42, "bar"];
+		myArray["3"] = "baz";
+		
+		console.log(myArray.length); // 4
+		console.log(myArray[3]); // "baz"
+
+- 复制对象：浅复制&深复制
+	- ES6 定义了 <span style="color:red">`Object.assign(...)`</span> 方法：实现浅复制
+
+			function anotherFunction() {}
+			
+			var anotherObject = {
+			  c: true
+			};
+			
+			var anotherArray = [];
+			
+			var myObject = {
+			  a: 2,
+			  b: anotherObject, // 引用，不是复本！
+			  c: anotherArray,  // 另一个引用
+			  d: anotherFunction
+			};
+			
+			var newObj = Object.assign({}, myObject);
+			
+			console.log(newObj.a); // 2
+			console.log(newObj.b === anotherObject);  // true
+			console.log(newObj.c === anotherArray); // true
+			console.log(newObj.d === anotherFunction);  // true
+
+- 属性描述符（数据描述符）：
+	- <span style="color:red">`Object.getOwnPropertyDescriptor()`</span>：检测属性特性
+	- <span style="color:red">`Object.defineProperty(...)`</span>：添加或修改属性，从而对特性进行设置
+
+			var myObject = {
+			  a: 2
+			};
+			
+			Object.getOwnPropertyDescriptor(myObject, 'a');
+			// {
+			//   value: 2,
+			//   writable: true,	// 决定是否可以修改属性的值
+			//   enumerable: true,	// 控制属性是否会出现在对象的属性枚举中，比如for...in循环
+			//   configurable: true	// 只要属性是可配置的，就可以使用 defineProperty(...)方法来修改属性描述符
+			// }
+			
+			Object.defineProperty(myObject, 'a', {
+			  value: 3,
+			  writable: true,
+			  configurable: true,
+			  enumerable: true
+			});
+			
+			myObject.a; // 3
+
+- 不变性：
+	- 对象常量：<span style="color:red">`writable:false`</span> + <span style="color:red">`configurable:false`</span>
+	- 禁止扩展：<span style="color:red">`Object.preventExtensions(...)`</span>
+	- 密封：<span style="color:red">`Object.seal(...)`</span>
+	- 冻结：<span style="color:red">`Object.freeze(...)`</span>
+
+- `Getter` 和 `Setter`：
+
+		var myObject = {
+		  // 给a定义一个 getter
+		  get a() {
+		    return this._a_;
+		  },
+		
+		  // 给a定义一个setter
+		  set a(val) {
+		    this._a_ = val * 2;
+		  }
+		
+		};
+		
+		console.log(myObject);
+		
+		Object.defineProperty(
+		  myObject, // 目标对象
+		  'b',  // 属性名
+		  { // 描述符
+		    // 给b设置一个 getter
+		    get: function() { return this.a * 2; },
+		
+		    // 确保b会出现在对象的属性列表中
+		    enumerable: true
+		  }
+		);
+		
+		myObject.a = 2;
+		
+		console.log(myObject.a);  // 4
+		console.log(myObject.b);  // 8
+
+- 存在性
+	- <span style="color:red">`in`</span>：对象上所有属性
+	- <span style="color:red">`hasOwnProperty()`</span>：所有实例属性
+	- <span style="color:red">`Object.keys()`</span>：对象上所有可枚举属性
+	- <span style="color:red">`Object.getOwnPropertyNames()`</span>：所有实例属性
+	- `for...in` 循环会枚举所有可枚举属性
+	- 最好只在对象上应用 `for...in` 循环，如果要遍历数组就使用传统的 `for循环` 来遍历数值索引。
+
+- 遍历
+	- <span style="color:red">`for...in`</span>：遍历对象的可枚举属性，但是不保证顺序
+	- <span style="color:red">`for...of`</span>：直接遍历属性值，ES6新增
+
+			var myArray = [1, 2, 3];
+			
+			for (var v of myArray) {
+			  console.log(v);
+			}
+			// 1
+			// 2
+			// 3
+> `for...of` 循环首先会向被访问对象请求一个迭代器对象，然后通过调用迭代器对象的 `next()` 方法来遍历所有返回值。
+> 
+> 数组有内置的 @@iterator，因此 `for...of` 可以直接应用在数组上。
+> 
+> 普通的对象没有内置的 @@iterator，所以无法自动完成 `for...of` 遍历，但是可以给任何想遍历的对象自定义 @@iterator
+
+[*使用内置的 @@iterator 手动遍历数组* ]：
+
+	var myArray = [1, 2, 3];
+	
+	// 使用 Symbol.iterator 来获取对象的 @@iterator 内部属性
+	// @@iterator 本身并不是一个迭代器对象，而是一个返回迭代器对象的属性
+	var it = myArray[Symbol.iterator]();
+	
+	it.next();  // { value: 1, done: false }
+	it.next();  // { value: 1, done: false }
+	it.next();  // { value: 1, done: false }
+	it.next();  // { value: undefined, done: true }
+
+### <p style="background:orange;">第4章 混合对象“类”</p>
+'
 ### <p style="background:orange;">第5章 原型</p>
 
 ### <p style="background:orange;">第6章 行为委托</p>

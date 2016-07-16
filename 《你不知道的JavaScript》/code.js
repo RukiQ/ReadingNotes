@@ -1,13 +1,8 @@
-function foo() {
-    setTimeout(() => {
-        // 这里的 this 在此法上继承自 foo()
-        console.log(this.a);
-    }, 100);
-}
+var myArray = [1, 2, 3];
 
-var obj = {
-    a: 2
-};
+var it = myArray[Symbol.iterator]();
 
-foo.call(obj);  // 2
-
+it.next();  // { value: 1, done: false }
+it.next();  // { value: 1, done: false }
+it.next();  // { value: 1, done: false }
+it.next();  // { value: undefined, done: true }
