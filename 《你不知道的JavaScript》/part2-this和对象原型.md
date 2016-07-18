@@ -599,7 +599,63 @@ JavaScript 环境中内置的 setTimeout() 函数实现和下面的伪代码类�
 	it.next();  // { value: undefined, done: true }
 
 ### <p style="background:orange;">第4章 混合对象“类”</p>
-'
+
+##### ☞ 类理论
+
+- 类是一种设计模式，所以你可以用一些方法近似实现类的功能。
+- 许多语言提供了对于面向类软件设计的原生语法。JavaScript也有类似的语法，但是和其他语言中的类完全不同。
+- 在软件设计中类是一种可选的模式，你需要自己决定是否在 JavaScript 中使用它。
+
+##### ☞ 类的机制
+
+- 一个类是一张蓝图，对象是类中描述的所有特性的一个<span style="color:red">副本</span>。类通过<span style="background:yellow">复制</span>操作被实例化为对象形式。
+
+##### ☞ 类的继承
+
+- 子类会包含父类行为的原始副本，但是也可以重写所有继承的行为甚至新行为。
+- 多态
+	- 任何方法都可以引用继承层次中高层的方法；
+	- 在继承链的不同层次中的一个方法名可以被多次定义，当调用方法时会自动选择合适的定义。
+- 多重继承：意味着所有父类的定义都会被复制到子类中。
+- JavaScript 本身不提供“多重继承”功能。
+
+##### ☞ 混入：模拟类的复制行为
+
+- 在继承或实例化时，JavaScript 的对象机制并不会自动执行复制行为。
+
+- JavaScript 中只有对象，并不存在可以被实例化的“类”。一个对象并不会被复制到其他对象，它们会被<span style="background:yellow">关联起来</span>。
+
+- 混入模式可以用来模拟类的复制行为，但是通常会产生丑陋并且脆弱的语法，比如显式伪多态（OtherObje.methodName.call(this, ...)），这会让代码更加难懂且难以维护。
+
+- 此外，显式混入实际上无法完全模拟类的复制行为，因为对象只能复制引用，无法复制被引用的对象或者函数本身！
+
+> 总的来说，在 JavaScript 中模拟类是得不偿失的，虽然能解决当前的问题，但是可能会埋下更多的隐患。
+
 ### <p style="background:orange;">第5章 原型</p>
+
+##### ☞ “类”
+
+- JavaScript 中的“类似类”的行为利用了函数的一种特殊特性：所有的函数默认都会拥有一个名为 `prototype` 的公有且不可枚举的属性，它会指向另一个对象。
+- 在 JavaScript 中，并没有类似的复制机制。你不能创建一个类的多个实例，只能创建多个对象，它们	`[[Prototype]]` 关联的是同一个对象。
+
+		function Foo() { //... };
+
+		// Foo 的原型
+		Foo.prototype;	// Object {}
+	
+		// 创建 a，并给 a 一个内部的 [[Prototype]] 链接，关联到 Foo.prototype 指向的那个对象
+		var a = new Foo();
+
+		Object.getPrototypeOf( a ) === Foo.prototype;	// true
+
+- 秘密：
+	- `new Foo()` 这个函数调用实际上并没有直接创建关联，这个关联只是一个意外的副作用。`new Foo()` 只是间接完成了我们的目标：一个关联到其他对象的新对象。
+	- 更直接的方法：<span style="color:red">`Object.create(..)`</span>
+
+![类的继承和原型继承对比]()
+
+- 继承意味着复制操作，JavaScript（默认）并不会复制对象属性。相反，JavaScript 会在两个对象之间创建一个关联，这样一个对象就可以通过<span style="background:yellow">委托</span>访问另一个对象的属性和函数。
+
+##### ☞ “类”
 
 ### <p style="background:orange;">第6章 行为委托</p>
