@@ -20,7 +20,7 @@
 
 ### <p style="background:orange;">第2章 this全面解析</p>
 
-##### ☞ 调用位置（调用方法）
+##### <p style="background: #cfc9fa">☞ 调用位置（调用方法）
 
 `调用栈`：为了到达当前执行位置所调用的所有函数，类似于函数调用链。
 
@@ -43,7 +43,7 @@
 	
 	baz();  // <-- baz 的调用位置
 
-##### ☞ 绑定规则
+##### <p style="background: #cfc9fa">☞ 绑定规则
 
 ###### ① 默认绑定：独立函数调用，`this` 指向全局对象
 
@@ -253,7 +253,7 @@ JavaScript 环境中内置的 setTimeout() 函数实现和下面的伪代码类�
 >
 > 4）如果函数没有返回其他对象，那么 `new` 表达式中的函数调用会自动返回这个新对象。
 
-##### ☞ 优先级/判断 `this`
+##### <p style="background: #cfc9fa">☞ 优先级/判断 `this`
 
 1. 由 `new` 调用？——> 绑定到新创建的对象。
 2. 由 `call` 或 `apply`（或者 `bind`）调用？——> 绑定到指定的对象。
@@ -278,7 +278,7 @@ JavaScript 环境中内置的 setTimeout() 函数实现和下面的伪代码类�
 >
 > bind(...)的功能之一就是可以把第一个参数（第一个参数用于绑定 this）之外的其他参数都传给下层的函数（这种技术成为“部分应用”，是“柯里化”的一种）。
 
-##### ☞ 绑定例外
+##### <p style="background: #cfc9fa">☞ 绑定例外
 
 ###### ① 被忽略的 `this`
 
@@ -397,7 +397,7 @@ JavaScript 环境中内置的 setTimeout() 函数实现和下面的伪代码类�
 	obj3.foo(); // name: obj3 
 	setTimeout(obj3.foo, 10);   // name: obj3
 
-##### ☞ `this` 词法 ——> 箭头函数
+##### <p style="background: #cfc9fa">☞ `this` 词法 ——> 箭头函数
 
 `箭头函数` 不使用 `this` 的四种标准规则，而是根据外层（函数或者全局）作用域来决定 `this`。
 
@@ -652,10 +652,79 @@ JavaScript 环境中内置的 setTimeout() 函数实现和下面的伪代码类�
 	- `new Foo()` 这个函数调用实际上并没有直接创建关联，这个关联只是一个意外的副作用。`new Foo()` 只是间接完成了我们的目标：一个关联到其他对象的新对象。
 	- 更直接的方法：<span style="color:red">`Object.create(..)`</span>
 
-![类的继承和原型继承对比]()
-
 - 继承意味着复制操作，JavaScript（默认）并不会复制对象属性。相反，JavaScript 会在两个对象之间创建一个关联，这样一个对象就可以通过<span style="background:yellow">委托</span>访问另一个对象的属性和函数。
 
-##### ☞ “类”
+	<img src="https://github.com/RukiQ/blog-learning-patch/blob/master/%E3%80%8A%E4%BD%A0%E4%B8%8D%E7%9F%A5%E9%81%93%E7%9A%84JavaScript%E3%80%8B/img/%E7%B1%BB%E6%9C%BA%E5%88%B6%E5%92%8C%E5%8E%9F%E5%9E%8B%E6%9C%BA%E5%88%B6%E5%AF%B9%E6%AF%94.jpg?raw=true" alt="类的继承和原型继承对比" width=500>
+
+##### ☞ （原型）继承
+
+- 调用 <span style="color:red">`Object.create(..)`</span> 会凭空创建一个“新”对象并把新对象内部的 `[[Prototype]]` 关联到你指定的对象。
+- <span style="background:yellow">优点</span>：可以充分发挥 `[[Prototype]]` 的威力（委托）并且避免不必要的麻烦（比如使用 `new` 的构造函数调用会生成 `.prototype` 和 `.constructor` 引用）。
+- <span style="background:yellow">唯一缺点</span>：需要创建一个新对象然后把旧对象抛弃掉，不能直接修改已有的默认对象。
+
+		function Foo(name) {
+		  this.name = name;
+		}
+		
+		Foo.prototype.myName = function() {
+		  return this.name;
+		};
+		
+		function Bar(name, label) {
+		  Foo.call(this, name);
+		  this.label = label;
+		}
+		
+		// 我们创建了一个新的 Bar.prototype 对象并关联到 Foo.prototype
+		Bar.prototype = Object.create( Foo.prototype );
+		
+		// 注意！现在没有 Bar.prototype.constructor 了
+		// 如果你需要这个属性的话可以手动修复一下它
+		Bar.prototype.myLabel = function() {
+		  return this.label;
+		};
+		
+		var a = new Bar('a', 'obj a');
+		
+		console.log( a.myName() ); // 'a'
+		console.log( a.myLabel() );  // 'obj a'
+
+- 两种常见的错误做法：
+
+		/**
+		 * 该方式不会创建一个关联到 Bar.prototype 的新对象
+		 * 只是让 Bar.prototype 直接引用 Foo.prototype 对象
+		 */
+		Bar.prototype = Foo.prototype;
+		
+		/**
+		 * 该方式的确会创建一个关联到 Bar.prototype 的新对象
+		 * 但是它使用了 Foo(..) 的“构造函数调用”，会影响 Bar() 的“后代”
+		 */
+		Bar.prototype = new Foo();
+	
+- ES6 添加了辅助函数 `Object.setPrototypeOf(..)`，可以用标准且可靠的方法来修改关联
+
+		// ES6 之前需要抛弃默认的 Bar.prototype
+		Bar.prototype = Object.create( Foo.prototype );
+		
+		// ES6 开始可以直接修改现有的 Bar.prototype
+		Object.setPrototypeOf( Bar.prototype, Foo.prototype );
+
+- 忽略调 `Object.create(..)` 方法带来的轻微性能损失（抛弃的对象需要进行垃圾回收），它实际上比 ES6 及其之后的方法更短而且可读性更高。
+
+##### ☞ 对象关联
+
+- `Object.create(null)` 会差un构建一个拥有空（或者说 `null`）`[[Prototype]]` 链接的对象，这个对象无法进行委托。由于这个对象没有原型链，所以 `instance` 操作符无法进行判断，因此总是会返回 `false`。这些特殊的空 `[[Prototype]]` 对象通常被称作“字典”，它们完全不会收到原型链的干扰，因此非常适合用来存储数据。
+
+[`Object.create(..)` 的 Polyfill 代码]：
+
+	if (!Object.create) {
+  	  Object.create = function(o) {
+    	function F() {}
+    	F.prototype = o;
+    	return new F();
+  	  }
+	}
 
 ### <p style="background:orange;">第6章 行为委托</p>
