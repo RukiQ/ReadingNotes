@@ -13,7 +13,7 @@
 
 Node与浏览器的对比：
 
-![Chrome浏览器和Node的组件构成]()
+![Chrome浏览器和Node的组件构成](https://github.com/RukiQ/ReadingNotes/blob/master/%E3%80%8A%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BANode.js%E3%80%8B/img/Chrome%E6%B5%8F%E8%A7%88%E5%99%A8%E5%92%8CNode%E7%9A%84%E7%BB%84%E4%BB%B6%E6%9E%84%E6%88%90.png?raw=true)
 
 > 除了 HTML、WebKit 和显卡这些 UI 相关技术没有支持外，Node 的结构与 Chrome 十分相似。
 > 
@@ -45,7 +45,7 @@ Node 保持了 JavaScritp 在浏览器中单线程的特点。并且在 Node 中
 
 4) 跨平台
 
-![Node基于libuv实现跨平台的架构示意图]()
+![Node基于libuv实现跨平台的架构示意图](https://github.com/RukiQ/ReadingNotes/blob/master/%E3%80%8A%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BANode.js%E3%80%8B/img/Node%E5%9F%BA%E4%BA%8Elibuv%E5%AE%9E%E7%8E%B0%E8%B7%A8%E5%B9%B3%E5%8F%B0.png?raw=true)
 
 > 目前，libuv 已经成为许多系统实现跨平台的基础组件。
 
