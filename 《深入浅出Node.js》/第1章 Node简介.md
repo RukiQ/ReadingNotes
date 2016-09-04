@@ -1,6 +1,8 @@
+[@by Ruth92](http://www.cnblogs.com/Ruth92/)（转载请注明出处）
+
 ## 第1章 Node简介
 
-#### 一、Node的起源
+#### <p style="background:orange;">一、Node的起源</p>
 
 高性能Web服务器的要点：事件驱动、非阻塞I/O。
 
@@ -13,13 +15,13 @@
 
 Node与浏览器的对比：
 
-![Chrome浏览器和Node的组件构成](https://github.com/RukiQ/ReadingNotes/blob/master/%E3%80%8A%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BANode.js%E3%80%8B/img/Chrome%E6%B5%8F%E8%A7%88%E5%99%A8%E5%92%8CNode%E7%9A%84%E7%BB%84%E4%BB%B6%E6%9E%84%E6%88%90.png?raw=true)
+![Chrome浏览器和Node的组件构成](https://github.com/RukiQ/ReadingNotes/blob/master/%E3%80%8A%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BANode.js%E3%80%8B/img/%E5%9B%BE1-1%20Chrome%E6%B5%8F%E8%A7%88%E5%99%A8%E5%92%8CNode%E7%9A%84%E7%BB%84%E4%BB%B6%E6%9E%84%E6%88%90.png?raw=true)
 
 > 除了 HTML、WebKit 和显卡这些 UI 相关技术没有支持外，Node 的结构与 Chrome 十分相似。
 > 
 > 它们都是基于事件驱动的异步架构，浏览器通过事件驱动来服务界面上的交互，Node 通过事件驱动来服务 I/O。
 
-#### 二、Node的特点
+#### <p style="background:orange;">二、Node的特点</p>
 
 1) 异步 I/O
 
@@ -45,11 +47,11 @@ Node 保持了 JavaScritp 在浏览器中单线程的特点。并且在 Node 中
 
 4) 跨平台
 
-![Node基于libuv实现跨平台的架构示意图](https://github.com/RukiQ/ReadingNotes/blob/master/%E3%80%8A%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BANode.js%E3%80%8B/img/Node%E5%9F%BA%E4%BA%8Elibuv%E5%AE%9E%E7%8E%B0%E8%B7%A8%E5%B9%B3%E5%8F%B0.png?raw=true)
+![Node基于libuv实现跨平台的架构示意图](https://github.com/RukiQ/ReadingNotes/blob/master/%E3%80%8A%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BANode.js%E3%80%8B/img/%E5%9B%BE1-4%20Node%E5%9F%BA%E4%BA%8Elibuv%E5%AE%9E%E7%8E%B0%E8%B7%A8%E5%B9%B3%E5%8F%B0.png?raw=true)
 
 > 目前，libuv 已经成为许多系统实现跨平台的基础组件。
 
-#### 三、Node 的应用场景
+#### <p style="background:orange;">三、Node 的应用场景</p>
 
 1) I/O 密集型
 
