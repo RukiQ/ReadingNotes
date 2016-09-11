@@ -108,15 +108,16 @@
 `Buffer` 在使用场景中，通常是以一段一段的方式传输。
 
 	var fs = require('fs');
-	
-	var rs = fs.createReadStream('test.md', {highWaterMark: 11});
+	var rs = fs.createReadStream('test.md');
 	var data = '';
+
 	rs.on('data', function(chunk) {
 		// data 事件中获取的 chunk 对象即是 Buffer 对象
 		// 隐藏了 toString() 操作
 		// 等价于：data = data.toString() + chunk.toString();
 	    data += chunk;
 	});
+
 	rs.on('end', function() {
 	    console.log(data);
 	});
@@ -133,9 +134,9 @@
 
 	☁ 对于任意长度的 `Buffer` 而言，宽字节字符串都有可能存在被截断的情况，只不过 `Buffer` 的长度越大出现的概率越低而已。
 
-2. <span style="color:#ac4a4a">**setEncoding() 与 string_decoder()**</span>
+2. <span style="color:#ac4a4a">**setEncoding() 与 string_decoder()**</span>  ☛ 不能从根本上解决乱码问题
 
-	**`setEncoding`** 方法：设置编码
+	◐ **`setEncoding`** 方法：设置编码
 	
 	【作用】：让 data 事件中传递的不再是一个 `Buffer` 对象，而是编码后的字符串。
 
@@ -145,11 +146,86 @@
 		rs.setEncoding('utf8');
 		// => 窗前明月光，疑是地上霜
 
-	
+	如论如何设置编码，触发 data 事件的次数依旧相同，即意味着设置编码并未改变按段读取的基本方式。
+
+	在调用 `setEncoding()` 时，可读流对象在内部设置了一个 `decoder` 对象。
+
+	◑ **`decoder`** 对象：来自于 `string_decoder` 模块 `StringDecoder` 的实例对象，最终解决乱码问题。
+
+		// decoder 的神奇原理：
+		var StringDecoder = require('string_decoder').StringDecoder;
+		var decoder = new StringDecoder('utf8');
+		
+		var buf1 = new Buffer([0xE5, 0xBA, 0x8A, 0xE5, 0x89, 0x8D, 0xE6, 0x98, 0x8E, 0xE6, 0x9C]);
+		console.log(decoder.write(buf1));   // => 床前明
+		
+		var buf2 = new Buffer([0x88, 0xE5, 0x85, 0x89, 0xEF, 0xBC, 0x8C, 0xE7, 0x96, 0x91, 0xE6]);
+		console.log(decoder.write(buf2));   // => 月光，疑
+
+	> 虽然 `string_decoder` 模块很奇妙，但是它也并非万能药，它目前只能处理 UTF8、Base64 和 UCS-2/UTF-16LE 这3种编码。所以，通过 `setEncoding()` 的方式不可否认能解决大部分的乱码问题，但并不能从根本上解决该问题。
 
 3. <span style="color:#ac4a4a">**正确拼接 Buffer**</span>
 
+	① 用一个数组来存储接收到的所有 `Buffer` 片段并记录下所有片段的总长度；
+	
+	② 调用 `Buffer.concat()` 方法生成一个合并的 `Buffer` 对象。
 
+		var chunks = [];
+		var size = 0;
+		
+		rs.on('data', function(chunk) {
+		    chunks.push(chunk);
+		    size += chunk.length;
+		});
+		
+		rs.on('end', function() {
+		    var buf = Buffer.concat(chunks, size);
+		    var str = iconv.decode(buf, 'utf8');
+		    console.log(str);
+		});
+
+	`Buffer.concat()` 方法封装了从小 `Buffer` 对象向大 `Buffer` 对象的复制过程：
+
+		Buffer.concat = function(list, length) {
+		    if (!Array.isArray(list)) {
+		        throw new Error('Usage: Buffer.concat(list, [length]');
+		    }
+		
+		    if (list.length === 0) {
+		        return new Buffer(0);
+		    } else if (list.length === 1) {
+		        return list[0];
+		    }
+		
+		    if (typeof length !== 'number') {
+		        length = 0;
+		        for (var i = 0; i < list.length; i++) {
+		            var buf = list[i];
+		            length += buf.length;
+		        }
+		    }
+		
+		    var buffer = new Buffer(length);
+		    var pos = 0;
+		    for (var i = 0; i < list.length; i++) {
+		        var buf = list[i];
+		        buf.copy(buffer, pos);
+		        pos += buf.length;
+		    }
+		    return buffer;
+		}
 
 #### <p style="background:orange;">四、Buffer 与性能</p>
 	
+- `Buffer` 在文件 I/O 和网络 I/O 中运用广泛。
+
+	- 在应用中：操作字符串；
+	
+	- 在网络中传输：需要转换为 `Buffer`，以进行二进制数据传输。
+
+- 在 Web 应用中，字符串转换到 `Buffer` 是时时刻刻发生的，提高字符串到 `Buffer` 的转换效率，可以很大程度地提高网络吞吐率。
+
+- `Buffer` 的使用除了与字符串的转换有性能损耗外，在文件的读取时，有一个 `highWaterMark` 设置对性能的影响至关重要。
+	- highWaterMark 设置对 `Buffer` 内存的分配和使用有一定影响；
+	- highWaterMark 设置过小，可能导致系统调用次数过多；
+	- highWaterMark 的值越大，读取速度越快。
