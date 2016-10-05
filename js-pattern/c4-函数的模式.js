@@ -92,7 +92,7 @@ next(); // 2
 //=================================== 3.自定义函数(?) ===================================
 
 /**
- * 自定义函数：可以更新自身的实现
+ * 自定义函数（惰性函数自定义）：可以更新自身的实现
  * 当有一些初始化准备工作要做，并且仅需要执行一次，该模式就非常有用
  */
 var scareMe = function() {
@@ -226,7 +226,7 @@ var utils = {
 };
 
 
-// 之后
+// 之后：可以在脚本初始化加载时一次性探测出浏览器特征
 
 // 接口
 var utils = {
@@ -241,10 +241,24 @@ if (typeof window.addEventListener === 'function') {
   utils.removeListener = function(el, type, fn) {
     el.removeEventListener(type, fn, false);
   };
-} else if (typeof document.attachEvent === 'function') {  // IE浏览器
-  //...
-} else {  // 更早版本浏览器
-  //...
+
+  // 判断为IE浏览器
+} else if (typeof document.attachEvent === 'function') {
+  utils.addListener = function(el, type, fn) {
+    el.attachEvent('on' + type, fn);
+  };
+  utils.removeListener = function(el, type, fn) {
+    el.detachEvent('on' + type, fn);
+  }
+
+  // 更早版本浏览器
+} else {
+  utils.addListener = function(el, type, fn) {
+    el['on' + type] = fn;
+  };
+  utils.removeListener = function(el, type, fn) {
+    el['on' + type] = null;
+  }
 }
 
 
@@ -270,11 +284,27 @@ myFunc.cache = {};
 /**
  * 优化点
  */
-// 1.参数优化：如果有更多及复杂的参数，可以将它们序列化为一个JSON字符串
-var cachekey = JSON.stringify(Array.prototype.slice.call(arguments));
+var myFunc = functino() {
+    
+    // 1.参数优化：如果有更多及复杂的参数，可以将它们序列化为一个JSON字符串
+    var cachekey = JSON.stringify(Array.prototype.slice.call(arguments)),
+        result;
 
-// 2.使用 arguments.callee 来引用该函数
-var f = arguments.callee;
+    // 2.使用 arguments.callee 来引用该函数，在ES5的严格模式中不支持
+    var f = arguments.callee;
+
+    if (!f.cache[cachekey]) {
+        var result = {};
+        //... 开销很大的操作 ...
+        f.cache[cachekey] = result;
+    }
+
+    return f.cache[cachekey];
+};
+
+// 缓存存储
+myFunc.cache = {};
+
 
 
 //================================== 8.配置对象 ===================================
@@ -292,6 +322,21 @@ addPerson(conf);
 
 
 //================================== 9.Curry化 ===================================
+// 定义函数
+var sayHi = function(who) {
+    return "Hello" + (who ? "," + who : "") + "!";
+};
+
+// 调用函数
+sayHi();    //'Hello'
+sayHi('world'); // 'Hello, world'
+
+// 应用函数1
+sayHi.apply(null, ["hello"]);   // 'Hello, hello!'
+
+// 应用函数2：使用 call() 方法比 apply() 更有效率，节省了一个数组
+sayHi.call(null, 'hello');  // 'Hello, hello!'
+
 
 /**
  * curry化的add()函数

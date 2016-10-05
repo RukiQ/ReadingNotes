@@ -1,6 +1,14 @@
 //=================================== 1.命名空间模式 =================================
-// 全局变量
+// 全局变量，不安全
 var MYAPP = {};
+
+// 更好的代码风格
+if (typeof MYAPP === 'undefined') {
+    var MYAPP = {};
+}
+
+// 或者用更短的语句
+var MYAPP = MYAPP || {};
 
 // 构造函数
 MYAPP.Parent = function() {};
@@ -16,6 +24,40 @@ MYAPP.modules = {};
 MYAPP.modules.module1 = {};
 MYAPP.modules.module1.data = {a: 1, b: 2};
 MYAPP.modules.module2 = {};
+
+/**
+ * 通用命名空间函数实现示例：
+ */
+var MYAPP = MYAPP || {};
+
+MYAPP.namespace = function(ns_string) {
+    var parts = ns_string.split('.'),
+        parent = MYAPP,
+        i;
+
+    // 剥离最前面的冗余全局变量
+    if (parts[0] === 'MYAPP') {
+        parts = parts.slice(1);
+    }
+
+    for (i = 0; i < parts.length; i++) {
+        // 如果它不存在，就创建一个属性
+        if (typeof parent[parts[i]] === 'undefined') {
+            parent[parts[i]] = {};
+        }
+        parent = parent[parts[i]];
+    }
+
+    return parent;
+}
+
+// 测试：
+// 将返回值赋给一个局部变量
+var module2 = MYAPP.namespace('MYAPP.modules.module2');
+module2 === MYAPP.modules.module2;  // true
+
+// 忽略最前面的'MYAPP'
+MYAPP.namespace('modules.module51');
 
 
 //=================================== 2.声明依赖模式 =================================
@@ -126,7 +168,7 @@ toy.getName();  // 特权 'own' 方法
 toy.getBrowser(); // 特权原型方法
 
 
-//=============== 揭示模块模式 ===================
+//=============== 将私有方法揭示为公共方法 ===================
 /**
  * 它建立在其中一种私有模式之上，即对象字面量中的私有成员
  */
@@ -150,9 +192,10 @@ var myarray;
     return -1;
   }
 
-  myarray = {
+  myarray = {   // 填充了认为适于公共访问的功能
     isArray: isArray,
-    indexOf: indexOf
+    indexOf: indexOf,   // 如果公共indexOf方法发生意外，私有indexOf方法仍然是安全的
+    inArray: indexOf    // inArray()将继续正常运行
   };
 }());
 
@@ -262,7 +305,9 @@ MYAPP.utilities.module = (function(app, global) {
 
 
 //================================= 5.沙箱模式 =================================
-// 使用沙箱的方法
+/**
+ * 多次实例化沙箱对象的方法：
+ */
 new SandBox(function(box) {
   // 你的代码写在这里...
 });
@@ -284,7 +329,10 @@ SandBox(function(box) {
 });
 
 
-//==================================
+//===============================
+/**
+ * 将一个模块嵌入到另一个模块中，且这两者之间不会相互干扰
+ */
 SandBox('dom', 'event', function(box) {
   // 使用 DOM 和事件来运行
   Sandbox('ajax', function(box) {
@@ -372,7 +420,6 @@ Sandbox.prototype = {
     return this.name;
   }
 }
-
 
 
 //===============================公有静态成员=========================
