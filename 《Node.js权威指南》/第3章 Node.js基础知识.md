@@ -23,3 +23,44 @@
 
 ## 二、Node.js中的全局作用域及全局函数
 
+（1）全局对象：
+
+- `global` 对象
+
+（2）全局函数：
+
+- `setTimeout` 和 `clearTimeout`
+		
+		setTimeout(cb, ms, [args], [...])
+
+		var timer = setTimeout(testFunction, 5000, 'this is a parameter.');
+		clearTimeout(timer);
+
+- `setInterval` 和 `clearInterval`
+
+		setInterval(cb, ms, [args], [...])
+
+		var timer = setInterval(testFunction, 5000, 'this is a parameter.');
+		clearInterval(timer);
+
+- 定时器对象的 `unref` 方法与 `ref` 方法：用于取消 `setTimeout` 和 `setInterval` 函数中指定的回调函数的调用，会产生性能影响，谨慎使用。
+
+		timer.unref();
+		timer.ref();
+
+（3）与模块相关的全局函数及对象：
+
+- 使用 `require` 函数加载模块
+
+	> 模块在首次加载后将缓存在内存缓存区中，即对于相同模块的多次引用得到的都是同一个模块对象，也即对于相同模块的多次引用不会引起模块内代码的多次执行。
+	
+- 使用 `require.resolve` 函数查询完整模块名（带有绝对路径）
+
+- `require.cache` 对象：代表缓存了所有已被加载模块的缓存区
+
+	> 当使用 `delete` 关键字删除缓存区中缓存的某个模块对象后，下次加载该模块时将重新运行该模块中的代码。
+
+- `__filename` 变量与 `__dirname` 变量：用于获取当前模块文件名（带有绝对路径）和当前目录名。
+
+（4）事件处理机制及事件环机制
+
