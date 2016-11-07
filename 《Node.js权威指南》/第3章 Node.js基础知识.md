@@ -64,3 +64,50 @@
 
 （4）事件处理机制及事件环机制
 
+- EventEmitter 类
+	
+	- addListener(event, listener)
+	
+	- on(event, listener)
+	
+	- once(event, listener)
+	
+	- removeListener(event, listener)
+	
+	- removeAllListener([even])
+	
+	- setMaxListeners(n)
+	
+	- listeners(event)
+	
+	- emit(event, [arg1], [arg2], [...])
+
+- EventEmitter 类的各个方法
+
+		var http = require('http');
+		var server = http.createServer();
+		
+		// 当服务器接收到客户端请求时，执行回调函数进行输出
+		server.on('request', function(req, res) {
+		
+		    /**
+		     * 浏览器为页面在收藏夹中的显示图标（默认为favicon.ico）
+		     * 如果不判断，也会输出 /favicon.ico
+		     */
+		    if (req.url !== '/favicon.ico') {
+		        console.log(req.url);   // 输出用户输入的目标URL地址
+		    }
+		    
+		    res.end();
+		});
+		
+		// 可以通过多个 on 方法的执行来对同一个事件绑定多个事件处理函数
+		server.on('request', function(req, res) {
+		    if (req.url !== '/favicon.ico') {
+		        console.log('发送响应完毕');
+		    }
+		    
+		    res.end();
+		});
+		
+		server.listen(1337, '127.0.0.1');
