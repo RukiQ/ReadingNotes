@@ -16,7 +16,7 @@
 
 1. <span style="color:#ac4a4a">**模块结构**</span>
 
-	[图6-1 Buffer的分工]()
+	![图6-1 Buffer的分工](https://github.com/RukiQ/ReadingNotes/blob/master/%E3%80%8A%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BANode.js%E3%80%8B/img/%E5%9B%BE6-1%20Buffer%E7%9A%84%E5%88%86%E5%B7%A5.png?raw=true)
 
 	`Buffer` 所占用的内存不是通过 V8 分配的，属于堆外内存。
 	

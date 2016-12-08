@@ -86,7 +86,7 @@
 
 	通常来说，POST、DELETE、PUT这类带行为性的请求操作一般不做任何缓存，大多数缓存只应用在GET请求中。
 
-	[图8-1 使用缓存的流程示意图]()
+	![图8-1 使用缓存的流程示意图](https://github.com/RukiQ/ReadingNotes/blob/master/%E3%80%8A%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BANode.js%E3%80%8B/img/%E5%9B%BE8-1%20%E4%BD%BF%E7%94%A8%E7%BC%93%E5%AD%98%E7%9A%84%E6%B5%81%E7%A8%8B%E7%A4%BA%E6%84%8F%E5%9B%BE.png?raw=true)
 
 	☛ **条件请求**
 
@@ -118,6 +118,6 @@
 
 #### <p style="background:orange;">四、中间件</p>
 
-[图8-4 中间件的工作模型]()
+![图8-4 中间件的工作模型](https://github.com/RukiQ/ReadingNotes/blob/master/%E3%80%8A%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BANode.js%E3%80%8B/img/%E5%9B%BE8-4%20%E4%B8%AD%E9%97%B4%E4%BB%B6%E7%9A%84%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%9E%8B.png?raw=true)
 
 #### <p style="background:orange;">五、页面渲染</p>
